@@ -23,6 +23,8 @@ plug "zsh-users/zsh-syntax-highlighting"
 
 # keybinds
 bindkey '^ ' autosuggest-accept
+bindkey -s '^f' "tmux-sessionizer\n"
+
 
 export PATH="$HOME/.local/bin":$PATH
 

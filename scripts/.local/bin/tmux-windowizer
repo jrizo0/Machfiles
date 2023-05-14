@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Buscamos en los directorios "~/Repos" y el actual y lo pipeamos a fzf para seleccionar una opción
+selected_dir=$(find ~/ ~/Repos -mindepth 1 -maxdepth 1 -type d | fzf)
+
+# Verificamos si el usuario seleccionó un directorio
+if [[ -n $selected_dir ]]
+then
+  # Creamos una nueva ventana de tmux con el nombre del directorio seleccionado
+  tmux new-window -n "$(basename $selected_dir)" -c "$(basename $selected_dir)"
+fi
+
