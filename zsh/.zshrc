@@ -41,3 +41,30 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+# vim switcher
+# alias nvim-lazy="NVIM_APPNAME=LazyVim nvim"
+# alias nvim-kick="NVIM_APPNAME=kickstart nvim"
+# alias nvim-chad="NVIM_APPNAME=NvChad nvim"
+# alias nvim-astro="NVIM_APPNAME=AstroNvim nvim"
+alias nvim-astro="NVIM_APPNAME=lvim nvim"
+alias nvim-mini="NVIM_APPNAME=minvim nvim"
+
+function nvims() {
+  # items=("default" "kickstart" "LazyVim" "NvChad" "AstroNvim")
+  items=("default" "minvim")
+  config=$(printf "%s\n" "${items[@]}" | fzf --prompt=" Neovim Config  " --height=~50% --layout=reverse --border --exit-0)
+  if [[ -z $config ]]; then
+    echo "Nothing selected"
+    return 0
+  elif [[ $config == "default" ]]; then
+    config=""
+  fi
+  NVIM_APPNAME=$config nvim $@
+}
+
+# end vim switcher
+
+# fnm
+export PATH="/home/jrizo/.local/share/fnm:$PATH"
+eval "`fnm env`"

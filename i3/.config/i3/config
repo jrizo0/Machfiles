@@ -2,10 +2,12 @@
 exec --no-startup-id xsetroot -solid "#010504"
 exec --no-startup-id nitrogen --restore
 
-
 # ONSTART
 exec copyq
-exec picom
+# screen effects
+exec --no-startup-id picom
+# NIGHT LIGHT
+# exec redshift -O 5000
 
 
 # HUAWEI LAPTOP TOUCHPAD SETTINGS
@@ -54,7 +56,10 @@ floating_modifier $mod
 
 # start a terminal
 # bindsym $mod+Return exec i3-sensible-terminal
-bindsym $mod+Return exec kitty
+# bindsym $mod+Return exec kitty
+# bindsym $mod+Return exec konsole
+bindsym $mod+Return exec alacritty
+bindsym $mod+g exec google-chrome
 
 
 # kill focused window
