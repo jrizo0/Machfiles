@@ -1,13 +1,15 @@
 # BG IMAGE
-exec --no-startup-id xsetroot -solid "#010504"
 exec --no-startup-id nitrogen --restore
-
-# ONSTART
-exec copyq
+# exec --no-startup-id  sh ~/.config/polybar/launch.sh --hack
+# exec --no-startup-id  polybar
+# exec --no-startup-id xsetroot -solid "#010504"
+exec --no-startup-id copyq
 # screen effects
 exec --no-startup-id picom
 # NIGHT LIGHT
-# exec redshift -O 5000
+# exec --no-startup-id redshift -O 5000
+exec --no-startup-id redshift -l 35:34 -t 3500:3500
+exec --no-startup-id dbus-launch dunst --config ~/.config/dunst/dunstrc
 
 
 # HUAWEI LAPTOP TOUCHPAD SETTINGS
@@ -229,6 +231,10 @@ bar {
         tray_output primary
 }
 
+
+bindsym $mod+x [floating] move scratchpad
+bindsym $mod+Shift+minus scratchpad show
+
 # ------------------------------------------
 # CUSTOM KEYS START
 # ------------------------------------------
@@ -246,8 +252,10 @@ bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 0 toggle # mute s
 # # Sreen brightness controls
 # bindsym XF86MonBrightnessUp exec xbacklight -inc 20 # increase screen brightness
 # bindsym XF86MonBrightnessDown exec xbacklight -dec 20 # decrease screen brightness
-bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set +5%
+bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set +5% 
+# bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set +5% && notify-send "Brightness - $(brightnessctl i | awk '/Current brightness/ {print $NF}')%"
 bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 5%-
+# bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 5%- && notify-send "Brightness - $(brightnessctl i | awk '/Current brightness/ {print $NF}')%"
 
 # Alsa audio controls.
 bindsym $mod+Shift+comma exec ~/.config/i3/scripts/alsa restore
@@ -258,3 +266,5 @@ bindsym $mod+m move workspace to output left
 # Suspend
 bindsym $mod+Shift+period exec systemctl suspend
 
+
+# bindsym $mod+d exec sh ~/.config/polybar/hack/scripts/launcher.sh

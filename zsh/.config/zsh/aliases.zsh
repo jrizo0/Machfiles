@@ -8,6 +8,7 @@ alias vim='nvim'
 alias nvimrc='nvim ~/.config/nvim/'
 alias yay="paru"
 
+alias pnpx="pnpm dlx"
 
 # alias lvim='nvim -u ~/.local/share/lunarvim/lvim/init.lua --cmd "set runtimepath+=~/.local/share/lunarvim/lvim"'
 
