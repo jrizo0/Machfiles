@@ -40,10 +40,11 @@ fi
 # alias nvim-astro="NVIM_APPNAME=AstroNvim nvim"
 alias nvim-astro="NVIM_APPNAME=lvim nvim"
 alias nvim-mini="NVIM_APPNAME=minvim nvim"
+alias v="NVIM_APPNAME=newvim nvim"
 
 function nvims() {
   # items=("default" "kickstart" "LazyVim" "NvChad" "AstroNvim")
-  items=("default" "minvim")
+  items=("default" "minvim" "newvim")
   config=$(printf "%s\n" "${items[@]}" | fzf --prompt=" Neovim Config  " --height=~50% --layout=reverse --border --exit-0)
   if [[ -z $config ]]; then
     echo "Nothing selected"
@@ -59,3 +60,21 @@ function nvims() {
 # fnm
 export PATH="/home/jrizo/.local/share/fnm:$PATH"
 eval "`fnm env`"
+
+# fnm
+export PATH="/Users/jrizo/Library/Application Support/fnm:$PATH"
+eval "`fnm env`"
+
+# pnpm
+export PNPM_HOME="/Users/jrizo/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+# bun completions
+[ -s "/Users/jrizo/.bun/_bun" ] && source "/Users/jrizo/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"

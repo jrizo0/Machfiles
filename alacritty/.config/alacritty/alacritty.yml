@@ -1,3 +1,109 @@
+# env:
+#   TERM: xterm-256color
+#
+# cursor:
+#   style:
+#     blinking: Never
+#     shape: Beam
+#
+# font:
+#   size: 14
+#   normal:
+#     family: "DankMono Nerd Font Mono"
+#     style: Regular
+#   bold:
+#     style: Bold
+#   italic:
+#     style: Italic
+#   bold_italic:
+#     style: Bold Italic
+#   ligatures: true
+#   offset:
+#     x: 0
+#     y: 4
+#   glyph_offset:
+#     x: 0
+#     y: 3
+#
+# window:
+#   semantic_escape_chars: ',│`|:"'' ()[]{}<>'
+#   save_to_clipboard: true
+#   live_config_reload: true
+#   option_as_alt: Both
+#   # Window padding (changes require restart)
+#   #
+#   # Blank space added around the window in pixels. This padding is not scaled by
+#   # DPI and the specified value is always added at both opposing sides.
+#   padding:
+#     x: 0
+#     y: 0
+#
+#   # Spread additional padding evenly around the terminal content.
+#   dynamic_padding: false
+#
+#   # Window decorations
+#   decorations: buttonless
+#   #
+#   # Startup Mode (changes require restart)
+#   #
+#   # Values for `startup_mode`:
+#   #   - Windowed
+#   #   - Maximized
+#   #   - Fullscreen
+#   #
+#   # Values for `startup_mode` (macOS only):
+#   #   - SimpleFullscreen
+#   startup_mode: Windowed
+#
+#   # Background opacity
+#   opacity: 1
+#
+# # Colors (Mellow)
+# colors:
+#   # Default colors
+#   primary:
+#     background: "#161617"
+#     foreground: "#c9c7cd"
+#
+#   # Cursor colors
+#   cursor:
+#     text: "#c9c7cd"
+#     cursor: "#757581"
+#
+#   # Normal colors
+#   normal:
+#     black: "#27272a"
+#     red: "#f5a191"
+#     green: "#90b99f"
+#     yellow: "#e6b99d"
+#     blue: "#aca1cf"
+#     magenta: "#e29eca"
+#     cyan: "#ea83a5"
+#     white: "#c1c0d4"
+#
+#   # Bright colors
+#   bright:
+#     black: "#353539"
+#     red: "#ffae9f"
+#     green: "#9dc6ac"
+#     yellow: "#f0c5a9"
+#     blue: "#b9aeda"
+#     magenta: "#ecaad6"
+#     cyan: "#f591b2"
+#     white: "#cac9dd"
+# key_bindings:
+#   - { key: V, mods: Control|Shift, action: Paste }
+#   - { key: C, mods: Control|Shift, action: Copy }
+#   - { key: Key0, mods: Control, action: ResetFontSize }
+#   - { key: Equals, mods: Control, action: IncreaseFontSize }
+#   - { key: Minus, mods: Control, action: DecreaseFontSize }
+#
+#
+#
+# ---- second option
+#
+
+#
 env:
   TERM: xterm-256color
 
@@ -6,54 +112,87 @@ env:
 colors:
   # Default colors
   primary:
-    # background: "#232731"
-    background: "#1f2227"
-    foreground: "#abb2bf"
+    background: "#161617"
+    foreground: "#c9c7cd"
+
+  # Cursor colors
+  cursor:
+    text: "#c9c7cd"
+    cursor: "#757581"
 
   # Normal colors
-  # Nord
   normal:
-    black: "#4C566A"
-    red: "#bf616a"
-    green: "#A3BE8C"
-    yellow: "#D7BA7D"
-    blue: "#5e81ac"
-    magenta: "#B48EAD"
-    cyan: "#88c0d0"
-    white: "#abb2bf"
+    black: "#27272a"
+    red: "#f5a191"
+    green: "#90b99f"
+    yellow: "#e6b99d"
+    blue: "#aca1cf"
+    magenta: "#e29eca"
+    cyan: "#ea83a5"
+    white: "#c1c0d4"
 
   # Bright colors
   bright:
-    black: "#4C566A"
-    red: "#bf616a"
-    green: "#A3BE8C"
-    yellow: "#D7BA7D"
-    blue: "#5e81ac"
-    magenta: "#B48EAD"
-    cyan: "#88c0d0"
-    white: "#abb2bf"
+    black: "#353539"
+    red: "#ffae9f"
+    green: "#9dc6ac"
+    yellow: "#f0c5a9"
+    blue: "#b9aeda"
+    magenta: "#ecaad6"
+    cyan: "#f591b2"
+    white: "#cac9dd"
 
-  normal:
-    black: "#4b5263"
-    red: "#e06c75"
-    green: "#98C379"
-    yellow: "#E5C07B"
-    blue: "#61AFEF"
-    magenta: "#C678DD"
-    cyan: "#56B6C2"
-    white: "#abb2bf"
+# colors:
+#   # Default colors
+#   primary:
+#     # background: "#232731"
+#     background: "#1f2227"
+#     foreground: "#abb2bf"
+#
+#   # Normal colors
+#   # Nord
+#   normal:
+#     black: "#4C566A"
+#     red: "#bf616a"
+#     green: "#A3BE8C"
+#     yellow: "#D7BA7D"
+#     blue: "#5e81ac"
+#     magenta: "#B48EAD"
+#     cyan: "#88c0d0"
+#     white: "#abb2bf"
+#
+#   # Bright colors
+#   bright:
+#     black: "#4C566A"
+#     red: "#bf616a"
+#     green: "#A3BE8C"
+#     yellow: "#D7BA7D"
+#     blue: "#5e81ac"
+#     magenta: "#B48EAD"
+#     cyan: "#88c0d0"
+#     white: "#abb2bf"
 
-  # Bright colors
-  bright:
-    black: "#4b5263"
-    red: "#e06c75"
-    green: "#98C379"
-    yellow: "#E5C07B"
-    blue: "#61AFEF"
-    magenta: "#C678DD"
-    cyan: "#56B6C2"
-    white: "#abb2bf"
+  # Normal
+  # normal:
+  #   black: "#4b5263"
+  #   red: "#e06c75"
+  #   green: "#98C379"
+  #   yellow: "#E5C07B"
+  #   blue: "#61AFEF"
+  #   magenta: "#C678DD"
+  #   cyan: "#56B6C2"
+  #   white: "#abb2bf"
 
+  # # Bright colors
+  # bright:
+  #   black: "#4b5263"
+  #   red: "#e06c75"
+  #   green: "#98C379"
+  #   yellow: "#E5C07B"
+  #   blue: "#61AFEF"
+  #   magenta: "#C678DD"
+  #   cyan: "#56B6C2"
+  #   white: "#abb2bf"
 
   # Change cursor colors
   cursor:
@@ -67,37 +206,44 @@ cursor:
 font:
   # The normal (roman) font face to use.
   normal:
-    # family: monospace
     # family: JetBrainsMono Nerd Font Mono
-    family: Dank Mono
+    # family: monospace
+    family: DankMono Nerd Font Mono
+    # family: FiraCode Nerd Font Mono
     # Style can be specified to pick a specific face.
     style: Regular
 
   # The bold font face
   bold:
+    # family: JetBrainsMono Nerd Font Mono
     # family: monospace
-    family: Dank Mono
+    family: DankMono Nerd Font Mono
+    # family: FiraCode Nerd Font Mono
     # Style can be specified to pick a specific face.
     style: Bold
 
   # The italic font face
   italic:
+    # family: JetBrainsMono Nerd Font Mono
     # family: monospace
-    family: Dank Mono
+    family: DankMono Nerd Font Mono
+    # family: FiraCode Nerd Font Mono
     # Style can be specified to pick a specific face.
     style: Italic
 
-  size: 16.0
+  size: 14.0
 
   ligatures: true
 
   offset:
     x: 0
-    y: 10
+    y: 4
   glyph_offset:
     x: 0
-    y: 4
+    y: 3
 window:
+  decorations: buttonless # macos
+  # decorations: none # else
   # opacity: 0.8
   opacity: 1.0
   padding:
@@ -111,7 +257,7 @@ window:
   #   # scrollback is enabled (history > 0).
   #   multiplier: 10
 
-# Allow terminal applications to change Alacritty's window title.
+  # Allow terminal applications to change Alacritty's window title.
   dynamic_title: true
 
   # # If `true`, bold text is drawn using the bright color variants.
@@ -127,6 +273,7 @@ key_bindings:
   - { key: Key0, mods: Control, action: ResetFontSize }
   - { key: Equals, mods: Control, action: IncreaseFontSize }
   - { key: Minus, mods: Control, action: DecreaseFontSize }
+  # - { key: Minus, mods: Command, chars: "^[-"}
   # - { key: Add, mods: Control, action: IncreaseFontSize }
   # - { key: Subtract, mods: Control, action: DecreaseFontSize }
   # - { key: N, mods: Control, action: SpawnNewInstance }
