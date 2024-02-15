@@ -71,7 +71,9 @@ case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
+alias pn="pnpm"
 # pnpm end
+
 # bun completions
 [ -s "/Users/jrizo/.bun/_bun" ] && source "/Users/jrizo/.bun/_bun"
 

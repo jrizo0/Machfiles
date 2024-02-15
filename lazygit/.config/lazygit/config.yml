@@ -1,31 +1,58 @@
 gui:
+  # theme:
+  #   activeBorderColor:
+  #     - blue
+  #     - bold
+  #   inactiveBorderColor:
+  #     - white
+  #   optionsTextColor:
+  #     - blue
+  #   selectedLineBgColor:
+  #     - default
+  #   selectedRangeBgColor:
+  #     - default
+  #   cherryPickedCommitBgColor:
+  #     - cyan
+  #   cherryPickedCommitFgColor:
+  #     - blue
+  #   unstagedChangesColor:
+  #     - red
   theme:
     activeBorderColor:
-      - blue
+      - '#fab387'
       - bold
     inactiveBorderColor:
-      - white
+      - '#a6adc8'
     optionsTextColor:
-      - blue
+      - '#89b4fa'
     selectedLineBgColor:
-      - default
+      - '#313244'
     selectedRangeBgColor:
-      - default
+      - '#313244'
     cherryPickedCommitBgColor:
-      - cyan
+      - '#45475a'
     cherryPickedCommitFgColor:
-      - blue
+      - '#fab387'
     unstagedChangesColor:
-      - red
+      - '#f38ba8'
+    defaultFgColor:
+      - '#cdd6f4'
+    searchingActiveBorderColor:
+      - '#f9e2af'
 
   showFileTree: true # for rendering changes files in a tree format
-  showListFooter: false # for seeing the '5 of 20' message in list panels
-  showRandomTip: false
-  showBottomLine: false # for hiding the bottom information line (unless it has important information to tell you)
+  showListFooter: true # for seeing the '5 of 20' message in list panels
+  showRandomTip: true
+  showBottomLine: true # for hiding the bottom information line (unless it has important information to tell you)
   showCommandLog: true
   showIcons: true
 
-disableStartupPopups: true
-notARepository: 'skip' # one of: 'prompt' | 'create' | 'skip'
-os:
-  edit: 'nvim' 
+# disableStartupPopups: true
+# notARepository: "skip" # one of: 'prompt' | 'create' | 'skip'
+# os:
+#   edit: "nvim"
+
+git:
+  paging:
+    colorArg: always
+    pager: diff-so-fancy
