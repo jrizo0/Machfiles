@@ -1,0 +1,129 @@
+[env]
+TERM = "xterm-256color"
+
+[general]
+import = [
+    # "~/Machfiles/alacritty/.config/alacritty/theme/alacritty-theme/themes/github_light.toml"
+    # "~/Machfiles/alacritty/.config/alacritty/theme/alacritty-theme/themes/catppuccin_frappe.toml"
+    "~/Machfiles/alacritty/.config/alacritty/theme/alacritty-theme/themes/catppuccin_mocha.toml"
+    # "~/Machfiles/alacritty/.config/alacritty/theme/alacritty-theme/themes/moonfly.toml"
+    # "~/Machfiles/alacritty/.config/alacritty/theme/catppuccin-macchiato.toml"
+    # "~/Machfiles/alacritty/.config/alacritty/theme/catppuccin-frappe.toml" 
+    # "~/Machfiles/alacritty/.config/alacritty/theme/catppuccin-latte.toml"
+    # "~/Machfiles/alacritty/.config/alacritty/theme/one-darker-custom.toml"
+    # "~/Machfiles/alacritty/.config/alacritty/theme/old-1"
+    # "~/Machfiles/alacritty/.config/alacritty/theme/old-2"
+]
+
+[cursor.style]
+blinking = "Never"
+
+[font]
+size = 14
+# ligatures = true
+
+[font.normal]
+family = "JetBrainsMono Nerd Font"
+# family = "JetBrainsMono Nerd Font Mono"
+# family = "monospace"
+# family = "DankMono Nerd Font Mono"
+# family = "FiraCode Nerd Font Mono"
+style = "Regular"
+
+[font.bold]
+family = "JetBrainsMono Nerd Font"
+# family = "JetBrainsMono Nerd Font Mono"
+# family = "monospace" 
+# family = "DankMono Nerd Font Mono"
+# family = "FiraCode Nerd Font Mono"
+style = "Bold"
+
+[font.italic]
+family = "JetBrainsMono Nerd Font"
+# family = "JetBrainsMono Nerd Font Mono"
+# family = "monospace"
+# family = "DankMono Nerd Font Mono"  
+# family = "FiraCode Nerd Font Mono"
+style = "Italic"
+
+[font.offset]
+x = 0
+y = 8 # jetbrainsmono
+# y = 7 # dankmono
+
+[font.glyph_offset]
+x = 0
+y = 4
+
+[window]
+decorations = "buttonless" # macos
+# decorations = "none" # else
+# opacity = 0.8
+opacity = 1.0
+# history = 10000
+dynamic_title = true
+
+[window.padding]
+x = 0
+y = 0
+
+# [scrolling]
+# Maximum number of lines in the scrollback buffer.
+# Specifying '0' will disable scrolling.
+# history = 10000
+# Number of lines the viewport will move for every line scrolled when
+# scrollback is enabled (history > 0).
+# multiplier = 10
+
+# If `true`, bold text is drawn using the bright color variants.
+# draw_bold_text_with_bright_colors = true
+
+# [selection]
+# semantic_escape_chars = ",│`|:\"' ()[]{}<>"
+# save_to_clipboard = true
+# live_config_reload = true
+
+[[keyboard.bindings]]
+key = "V"
+mods = "Control|Shift" 
+action = "Paste"
+
+[[keyboard.bindings]]
+key = "C"
+mods = "Control|Shift"
+action = "Copy"
+
+[[keyboard.bindings]]
+key = "Key0"
+mods = "Control"
+action = "ResetFontSize"
+
+[[keyboard.bindings]]
+key = "Equals"
+mods = "Control"
+action = "IncreaseFontSize"
+
+[[keyboard.bindings]]
+key = "Minus"
+mods = "Control"
+action = "DecreaseFontSize"
+
+# [[keyboard.bindings]]
+# key = "Minus"
+# mods = "Command"
+# chars = "^[-"
+
+# [[keyboard.bindings]]
+# key = "Add"
+# mods = "Control"
+# action = "IncreaseFontSize"
+
+# [[keyboard.bindings]]
+# key = "Subtract" 
+# mods = "Control"
+# action = "DecreaseFontSize"
+
+# [[keyboard.bindings]]
+# key = "N"
+# mods = "Control"
+# action = "SpawnNewInstance"
