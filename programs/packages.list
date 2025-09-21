@@ -43,8 +43,8 @@ pango1.0-tools
 
 # Network Tools
 telnet
-openssh-client
-openssh-server
+# openssh-client
+# openssh-server
 
 # Text Processing
 sed
@@ -52,9 +52,9 @@ gawk
 diffutils
 
 # Python Libraries (via apt)
-python3-numpy
-python3-scipy
-python3-cairo
+# python3-numpy
+# python3-scipy
+# python3-cairo
 
 # Terminal Enhancements
 zoxide
