@@ -1,0 +1,97 @@
+# Development Tools
+build-essential
+git
+gh
+curl
+wget
+htop
+tree
+tmux
+zsh
+stow
+jq
+ripgrep
+fd-find
+fzf
+bat
+glow
+
+# Programming Languages & Runtimes
+python3
+python3-pip
+python3-dev
+python3-venv
+nodejs
+npm
+erlang
+elixir
+lua5.4
+luarocks
+ruby-full
+
+# Database Tools
+mysql-client
+postgresql-client
+sqlite3
+
+# Media & Graphics
+ffmpeg
+imagemagick
+tesseract-ocr
+cairo-dock
+pango1.0-tools
+
+# Network Tools
+telnet
+openssh-client
+openssh-server
+
+# Text Processing
+sed
+gawk
+diffutils
+
+# Python Libraries (via apt)
+python3-numpy
+python3-scipy
+python3-cairo
+
+# Terminal Enhancements
+zoxide
+neovim
+
+# Build Dependencies
+pkg-config
+libssl-dev
+libreadline-dev
+zlib1g-dev
+libncurses5-dev
+libffi-dev
+libgdbm-dev
+libnss3-dev
+libsqlite3-dev
+libbz2-dev
+libxml2-dev
+libxslt1-dev
+libcairo2-dev
+libgirepository1.0-dev
+libglib2.0-dev
+
+# X11 Tools (for GUI support)
+xclip
+xsel
+
+# Additional Development Tools
+cmake
+autoconf
+automake
+libtool
+
+# Container & Cloud Tools
+docker.io
+docker-compose
+
+# Font Management
+fonts-hack
+fonts-jetbrains-mono
+fonts-cascadia-code
