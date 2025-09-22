@@ -72,6 +72,18 @@ if ! command -v alacritty &> /dev/null; then
     sudo apt install -y alacritty
 fi
 
+# Zoxide (smart cd command)
+echo "Installing Zoxide..."
+curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+
+# Bun (JavaScript runtime and package manager)
+echo "Installing Bun..."
+curl -fsSL https://bun.com/install | bash
+
+# Zap (ZSH plugin manager)
+echo "Installing Zap ZSH plugin manager..."
+zsh <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/install.zsh) --branch release-v1
+
 echo ""
 echo "Installation complete!"
 echo ""
