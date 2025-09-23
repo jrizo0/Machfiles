@@ -41,9 +41,28 @@ git clone https://github.com/jrizo0/Machfiles.git ~/.machiles
 cd ~/.machiles
 ```
 
-## Apply All Dotfiles
+## Quick Setup (Recommended)
 
-### Stow all configurations at once
+### Automated minimal setup
+
+For a quick start with essential tools and configurations, use the automated setup script:
+
+```bash
+./programs/setup.sh
+```
+
+This script will:
+- Install essential packages from `packages.list`
+- Apply all dotfiles with `stow */`
+- Setup ZSH with Zap plugin manager  
+- Install Tmux with TPM
+- Make scripts executable
+
+**Note:** This covers the minimal setup. For additional tools (Homebrew, VSCode extensions, i3, etc.), continue with the manual steps below.
+
+## Manual Setup
+
+### Apply all dotfiles manually
 
 ```bash
 # From the dotfiles directory, apply all configurations
@@ -108,10 +127,6 @@ cd brew && brew bundle --file=.Brewfile
 ### Install packages for Ubuntu/Debian
 
 ```bash
-# Run the Ubuntu installation script
-chmod +x programs/install-ubuntu.sh
-./programs/install-ubuntu.sh
-
 # Install packages from list
 sudo apt install -y $(cat programs/packages.list)
 ```
