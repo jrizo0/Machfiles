@@ -1,5 +1,13 @@
 #!/bin/sh
+
+# eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# More general:
+if [[ "$(uname -s)" == "Linux" ]] && command -v brew &>/dev/null; then
+  eval "$(brew shellenv)"
+fi
+
 [ -f "$HOME/.local/share/zap/zap.zsh" ] && source "$HOME/.local/share/zap/zap.zsh"
+
 
 # history
 HISTFILE=~/.zsh_history
@@ -94,3 +102,11 @@ cc(){
 }
 
 export PATH="$HOME/.local/bin:$PATH"
+
+
+export NVM_DIR="$HOME/.nvm"
+  [ -s "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh" ] && \. "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"  # This loads nvm
+  [ -s "/home/linuxbrew/.linuxbrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/home/linuxbrew/.linuxbrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+
+# opencode
+export PATH=/home/jrizo/.opencode/bin:$PATH
