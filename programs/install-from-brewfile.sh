@@ -58,7 +58,6 @@ sudo apt install -y \
     htop \
     jq \
     glow \
-    neovim \
     python3 \
     python3-pip \
     python3-dev \
@@ -231,15 +230,6 @@ if ! command -v flyctl >/dev/null 2>&1; then
     print_success "Fly.io CLI installed"
 else
     print_success "Fly.io CLI already installed"
-fi
-
-# EdgeDB CLI
-if ! command -v edgedb >/dev/null 2>&1; then
-    print_status "Installing EdgeDB CLI..."
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.edgedb.com | sh -s -- --no-modify-path
-    print_success "EdgeDB CLI installed"
-else
-    print_success "EdgeDB CLI already installed"
 fi
 
 # Install Nerd Fonts (equivalent to your cask fonts)
