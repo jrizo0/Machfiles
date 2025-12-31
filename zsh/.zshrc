@@ -94,3 +94,6 @@ cc(){
 }
 
 export PATH="$HOME/.local/bin:$PATH"
+
+# opencode
+export PATH=/Users/jrizo/.opencode/bin:$PATH
