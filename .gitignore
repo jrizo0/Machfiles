@@ -2,3 +2,5 @@ scripts/.local/bin/rust-analyzer
 scripts/.local/bin
 getnf/
 lazygit/.config/lazygit
+**/node_modules/
+.DS_Store
