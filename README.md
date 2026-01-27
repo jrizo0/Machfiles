@@ -2,187 +2,337 @@
 
 Personal dotfiles and development environment setup for macOS and Linux.
 
-## Installing
-
-You will need `git` and GNU `stow`
-
-Clone into your `$HOME` directory or `~`
+## Quick Start
 
 ```bash
-git clone https://github.com/jrizo0/Machfiles ~/.machfiles
+# VPS/Server (Ubuntu 22.04+)
+git clone https://github.com/jrizo0/Machfiles ~/.machfiles && cd ~/.machfiles && ./programs/setup.sh --server
+
+# Linux Desktop (Ubuntu 22.04+)
+git clone https://github.com/jrizo0/Machfiles ~/.machfiles && cd ~/.machfiles && ./programs/setup.sh --desktop
+
+# macOS
+git clone https://github.com/jrizo0/Machfiles ~/.machfiles && cd ~/.machfiles && brew bundle --file=brew/.Brewfile && stow zsh tmux git gh lazygit scripts
 ```
 
-Run `stow` to symlink everything or just select what you want
+## What's Included
+
+### Stow Packages
+
+| Package | Description | Server | Desktop | macOS |
+|---------|-------------|:------:|:-------:|:-----:|
+| zsh | Shell config + Zap plugins | ✓ | ✓ | ✓ |
+| tmux | Terminal multiplexer config | ✓ | ✓ | ✓ |
+| git | Global gitignore | ✓ | ✓ | ✓ |
+| gh | GitHub CLI config | ✓ | ✓ | ✓ |
+| lazygit | Git UI theming | ✓ | ✓ | ✓ |
+| scripts | Utility scripts | ✓ | ✓ | ✓ |
+| alacritty | GPU terminal config | - | ✓ | ✓ |
+| kitty | Cross-platform terminal | - | ✓ | ✓ |
+| fontconfig | Font aliases (Linux) | - | ✓ | - |
+| yabai | macOS window manager | - | - | ✓ |
+| skhd | macOS hotkeys | - | - | ✓ |
+| karabiner | macOS keyboard remap | - | - | ✓ |
+| i3 | Linux window manager | - | ✓ | - |
+| polybar | Linux status bar | - | ✓ | - |
+| picom | Linux compositor | - | ✓ | - |
+| dunst | Linux notifications | - | ✓ | - |
+
+### CLI Tools (via Homebrew)
+
+- **Search/Navigation:** fzf, fd, ripgrep, zoxide
+- **File Viewing:** bat, eza, glow, jq
+- **Git:** lazygit, delta, gh
+- **Editors:** neovim
+- **Dev Tools:** fnm (Node.js), uv (Python), stow
+- **System:** tmux, htop, wget, curl
+
+---
+
+## Setup Guides
+
+### VPS / Server Setup
+
+For headless Ubuntu 22.04+ servers.
+
+#### Prerequisites
+
+- Ubuntu 22.04 or later
+- `sudo` access
+- Internet connection
+
+#### One-Command Setup
 
 ```bash
-stow */ # Everything (the '/' ignores the README)
+git clone https://github.com/jrizo0/Machfiles ~/.machfiles && cd ~/.machfiles && ./programs/setup.sh --server
 ```
 
+#### What Gets Installed
+
+- **APT packages:** build-essential, curl, wget, git, stow, zsh, tmux, jq, htop, tree, unzip, fontconfig
+- **Homebrew** (Linux)
+- **CLI tools:** fzf, bat, eza, fd, ripgrep, zoxide, lazygit, delta, fnm, gh, neovim, glow
+- **fnm** + Node.js LTS
+- **uv** (Python package manager)
+- **Zap** (ZSH plugin manager)
+- **TPM** (Tmux Plugin Manager)
+
+#### Stow Packages Applied
+
+`zsh`, `tmux`, `git`, `gh`, `lazygit`, `scripts`
+
+#### Post-Install Steps
+
+1. Restart terminal or run: `exec zsh`
+2. Start tmux and press `Ctrl+a I` to install plugins
+3. Configure Git credentials if prompted during setup
+
+---
+
+### Linux Desktop Setup
+
+For Ubuntu 22.04+ workstations with GUI.
+
+#### Prerequisites
+
+- Ubuntu 22.04 or later with desktop environment
+- `sudo` access
+- Internet connection
+
+#### One-Command Setup
+
 ```bash
-stow zsh # Just my zsh config
+git clone https://github.com/jrizo0/Machfiles ~/.machfiles && cd ~/.machfiles && ./programs/setup.sh --desktop
 ```
 
-## Linux Machine Initialization
+#### What Gets Installed
 
-For setting up a fresh Linux machine with your dotfiles and development environment.
+Everything from server setup, plus:
 
-### Prerequisites
+- **JetBrainsMono Nerd Font**
+- **VSCode extensions** (if VSCode is installed)
+- **Terminal configs:** alacritty, kitty
+- **Font configuration**
 
-```bash
-# Update system packages
-sudo apt update && sudo apt upgrade -y
+#### Stow Packages Applied
 
-# Install essential tools
-sudo apt install -y curl wget git build-essential
-```
+`zsh`, `tmux`, `git`, `gh`, `lazygit`, `scripts`, `alacritty`, `kitty`, `fontconfig`
 
-### Option 1: Using Homebrew (Recommended for consistency)
+#### Post-Install Steps
 
-Install Homebrew on Linux for package management consistency with macOS:
+1. Restart terminal or run: `exec zsh`
+2. Start tmux and press `Ctrl+a I` to install plugins
+3. Set terminal font to "JetBrainsMono Nerd Font"
+4. Optionally stow i3 window manager configs: `stow i3 polybar picom dunst`
 
-```bash
-# Install Homebrew
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+---
 
-# Add Homebrew to PATH (follow the instructions shown after installation)
-echo >> ~/.bashrc
-echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.bashrc
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+### macOS Setup
 
-# If you use zsh instead of bash
-echo >> ~/.zshrc
-echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.zshrc
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+For macOS workstations with Homebrew.
 
+#### Prerequisites
 
-# Clone your dotfiles
-git clone https://github.com/jrizo0/Machfiles ~/.machfiles
+- macOS with Homebrew installed
+- If Homebrew is not installed:
+  ```bash
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  ```
 
-# Install your packages from Brewfile
-cd ~/.machfiles/brew
-brew bundle install
-```
-
-### Option 2: Native Linux Package Installation (Automated)
-
-Use the automated script that maps your Brewfile packages to Linux equivalents:
+#### Setup Steps
 
 ```bash
-# Clone your dotfiles
+# Clone dotfiles
 git clone https://github.com/jrizo0/Machfiles ~/.machfiles
 cd ~/.machfiles
 
-# One-command complete setup (recommended)
-./programs/setup-linux.sh
+# Install packages from Brewfile
+brew bundle --file=brew/.Brewfile
 
-# Or run individual scripts
-chmod +x programs/install-from-brewfile.sh
-chmod +x programs/install-vscode-extensions.sh
-
-# Install all programs from your Brewfile
-./programs/install-from-brewfile.sh
-
-# Install VSCode extensions (if you use VSCode)  
-./programs/install-vscode-extensions.sh
+# Apply dotfiles
+stow zsh tmux git gh lazygit scripts alacritty kitty yabai skhd karabiner
 ```
 
-### Essential Setup Steps
+#### What Gets Installed
 
-1. **Install GNU Stow** (if not installed via Brew/apt):
-   ```bash
-   # Via apt (Ubuntu/Debian)
-   sudo apt install -y stow
-   
-   # Via Homebrew
-   brew install stow
-   ```
+- All CLI tools from the Brewfile
+- GUI apps: Alacritty, Raycast, Alt-Tab, etc.
+- Nerd Fonts: JetBrains Mono, Hack, CaskaydiaCove
+- Window management: yabai + skhd
+- VSCode extensions
 
-2. **Setup dotfiles**:
-   ```bash
-   cd ~/.machfiles
-   
-   # Link all configurations
-   stow */
-   
-   # Or selectively link what you need
-   stow zsh tmux alacritty kitty
-   ```
+#### Post-Install Steps
 
-3. **Set ZSH as default shell**:
-   ```bash
-   chsh -s $(which zsh)
-   ```
-
-4. **Install ZSH plugin manager (Zap)**:
+1. Restart terminal or run: `exec zsh`
+2. Start tmux and press `Ctrl+a I` to install plugins
+3. Install Zap plugin manager:
    ```bash
    zsh <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/install.zsh) --branch release-v1
    ```
-
-### Post-Installation
-
-1. **Restart your terminal** or run:
+4. Start yabai and skhd services:
    ```bash
-   source ~/.zshrc
+   yabai --start-service
+   skhd --start-service
+   ```
+5. Grant accessibility permissions for yabai and skhd in System Settings
+
+---
+
+## Configuration Details
+
+### ZSH
+
+- Plugin manager: [Zap](https://github.com/zap-zsh/zap)
+- Plugins loaded via `.zshrc`
+- Custom aliases and functions
+- PATH includes `~/.local/bin` for scripts
+
+### Tmux
+
+- Prefix: `Ctrl+a`
+- Plugin manager: TPM (auto-installed)
+- Theme: Catppuccin
+- Plugins: tmux-resurrect
+
+### Git & GitHub CLI
+
+- Global gitignore for common files
+- Delta for better diffs
+- GitHub CLI (`gh`) configuration
+
+### Terminal Emulators
+
+- **Alacritty:** GPU-accelerated terminal
+- **Kitty:** Cross-platform terminal with graphics support
+
+### Window Managers
+
+#### yabai/skhd (macOS)
+
+- Binary space partitioning layout
+- Mouse follows focus
+- Apps excluded: System Settings, Calculator, Discord, etc.
+
+#### i3 (Linux)
+
+- Mod key: `Alt`
+- Status bar: i3status
+- Compositor: picom
+- Notifications: dunst
+
+---
+
+## Utility Scripts
+
+Located in `scripts/.local/bin/`:
+
+| Script | Description |
+|--------|-------------|
+| `tmux-sessionizer` | Fuzzy find and switch to project directories as tmux sessions |
+| `tmux-windowizer` | Create new tmux window from selected directory |
+| `getnf` | Interactive Nerd Fonts installer |
+| `git-clone-bare-for-worktrees` | Clone repo as bare for git worktree workflow |
+
+---
+
+## Key Bindings Reference
+
+### Tmux (prefix: `Ctrl+a`)
+
+| Binding | Action |
+|---------|--------|
+| `prefix + h/j/k/l` | Navigate panes |
+| `prefix + f` | tmux-sessionizer (fuzzy project switcher) |
+| `prefix + g` | tmux-windowizer |
+| `prefix + I` | Install TPM plugins |
+| `prefix + c` | New window (current path) |
+| `prefix + "` | Split horizontal (current path) |
+| `prefix + %` | Split vertical (current path) |
+| `prefix + r` | Reload config |
+
+### Yabai/skhd (macOS)
+
+| Binding | Action |
+|---------|--------|
+| `alt + h/j/k/l` | Focus window left/down/up/right |
+| `shift + alt + h/j/k/l` | Swap window |
+| `ctrl + alt + h/j/k/l` | Warp window (move and split) |
+| `alt + f` | Toggle fullscreen |
+| `shift + alt + space` | Toggle float |
+| `shift + alt + 1-9` | Move window to space |
+| `ctrl + alt + r` | Restart yabai |
+
+### i3 (Linux, mod: `Alt`)
+
+| Binding | Action |
+|---------|--------|
+| `mod + h/j/k/l` | Focus window |
+| `mod + shift + h/j/k/l` | Move window |
+| `mod + f` | Toggle fullscreen |
+| `mod + shift + space` | Toggle float |
+| `mod + 1-9` | Switch workspace |
+| `mod + shift + 1-9` | Move to workspace |
+| `mod + Return` | Open Alacritty |
+| `mod + d` | dmenu launcher |
+| `mod + shift + q` | Kill window |
+| `mod + r` | Resize mode |
+
+---
+
+## Troubleshooting
+
+### Stow Conflicts
+
+If stow reports conflicts with existing files:
+
+```bash
+# Dry run to see what would happen
+stow -n -v zsh
+
+# Backup and remove conflicting files, then retry
+mv ~/.zshrc ~/.zshrc.bak
+stow zsh
+```
+
+### Shell Not Changing
+
+After running `chsh -s $(which zsh)`, log out and back in for the change to take effect.
+
+### Missing Fonts
+
+Refresh font cache after installing fonts:
+
+```bash
+fc-cache -fv
+```
+
+### TPM Plugins Not Installing
+
+Inside tmux, press `Ctrl+a I` (capital I) to install plugins. If TPM isn't installed:
+
+```bash
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+```
+
+### Homebrew PATH Issues
+
+For Linux, ensure Homebrew is in your PATH:
+
+```bash
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+```
+
+### yabai/skhd Not Working (macOS)
+
+1. Grant accessibility permissions in System Settings > Privacy & Security > Accessibility
+2. Restart services:
+   ```bash
+   yabai --restart-service
+   skhd --restart-service
    ```
 
-2. **Verify installations**:
-   ```bash
-   # Check key tools
-   tmux -V
-   nvim --version
-   git --version
-   lazygit --version
-   ```
+---
 
-3. **Setup development environments** as needed:
-   ```bash
-   # Node.js via fnm
-   fnm install --lts
-   fnm use lts-latest
-   
-   # Python via uv
-   uv python install 3.12
-   ```
+## License
 
-4. **Install VSCode** (if not done automatically):
-   ```bash
-   wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
-   sudo install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/
-   sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
-   sudo apt update && sudo apt install code
-   ```
-
-### Programs Installation Details
-
-The `install-from-brewfile.sh` script automatically maps your Homebrew packages to their Linux equivalents:
-
-| Brewfile Package | Linux Equivalent | Installation Method |
-|------------------|------------------|-------------------|
-| `git, gh, stow, tmux, zsh` | Same names | `apt install` |
-| `fd` | `fd-find` + symlink | `apt install fd-find` |
-| `bat` | `batcat` + symlink | `apt install bat` |
-| `lazygit` | Direct download | GitHub releases |
-| `zoxide` | Install script | Official installer |
-| `fnm` | Install script | Official installer |
-| `azure-cli` | Official repo | Microsoft installer |
-| `terraform` | Official repo | HashiCorp repo |
-| Nerd Fonts | Direct download | GitHub releases |
-
-### Notes
-
-- **Homebrew on Linux** provides excellent package management and keeps your setup consistent across macOS and Linux
-- **Native package installation** offers better system integration and performance
-- The automated scripts handle font installation, symlink creation, and PATH management
-- All VSCode extensions from your Brewfile are automatically installed
-- Some GUI applications may need additional setup depending on your desktop environment
-
-### Troubleshooting
-
-If you encounter issues:
-
-1. **Missing packages**: Some packages might not be available in older Ubuntu versions
-2. **Permission errors**: Ensure your user has sudo privileges
-3. **PATH issues**: Restart your shell or manually source your profile
-4. **Font issues**: Run `fc-cache -fv` to refresh font cache
-
-This approach gives you flexibility to use either Homebrew (for consistency) or native package managers (for performance/system integration), while maintaining the same dotfile structure across all your machines.
+MIT
