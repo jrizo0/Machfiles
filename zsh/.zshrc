@@ -105,8 +105,53 @@ export PATH="$HOME/.local/bin:$PATH"
 
 
 export NVM_DIR="$HOME/.nvm"
-  [ -s "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh" ] && \. "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"  # This loads nvm
-  [ -s "/home/linuxbrew/.linuxbrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/home/linuxbrew/.linuxbrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+  [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
+  [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+
 
 # opencode
 export PATH=/home/jrizo/.opencode/bin:$PATH
+
+# opencode
+export PATH=/Users/jrizo/.opencode/bin:$PATH
+
+# === CONFIG ===
+REPO_PATH="/Users/jrizo/Work/pioneer"
+LOG_FILE="/Users/jrizo/Desktop/pioneer-command-diary.log"
+
+# Variables internas
+typeset -g CMD_START_TIME
+typeset -g CMD_START_PWD
+typeset -g CMD_RUNNING
+
+# Se ejecuta justo ANTES del comando
+preexec() {
+  if [[ "$PWD" == "$REPO_PATH"* ]]; then
+    CMD_START_TIME=$(date +%s)
+    CMD_START_PWD="$PWD"
+    CMD_RUNNING="$1"
+  else
+    CMD_RUNNING=""
+  fi
+}
+
+# Se ejecuta justo ANTES de mostrar el prompt (cuando terminó)
+precmd() {
+  if [[ -n "$CMD_RUNNING" ]]; then
+    END_TIME=$(date +%s)
+    DURATION=$((END_TIME - CMD_START_TIME))
+
+    TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
+
+    {
+      echo "----------------------------------------"
+      echo "Date      : $TIMESTAMP"
+      echo "Directory : $CMD_START_PWD"
+      echo "Command   : $CMD_RUNNING"
+      echo "Duration  : ${DURATION}s"
+    } >> "$LOG_FILE"
+
+    CMD_RUNNING=""
+  fi
+}
+

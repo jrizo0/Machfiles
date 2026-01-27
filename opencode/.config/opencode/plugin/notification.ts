@@ -1,15 +1,15 @@
 import type { Plugin, tool } from "@opencode-ai/plugin";
 
 // Function to play bell sound
-async function playBellSound($: any) {
+async function playBellSound($: any, sessionTitle?: string) {
   try {
     // @ts-ignore
     const platform = process.platform;
 
     if (platform === "darwin") {
-      // macOS - use system sound
-      // await $`afplay /System/Library/Sounds/Bottle.aiff`;
-      await $`say "opencode done"`;
+      // macOS - use system sound with session name
+      const sayName = sessionTitle || "task";
+      await $`say "opencode ${sayName} done"`;
     } else if (platform === "linux") {
       // Linux - try multiple audio players
       try {
@@ -48,12 +48,20 @@ export const NotificationPlugin: Plugin = async ({
       if (event.type === "session.idle") {
         const sessionID = event.properties.sessionID;
 
-        // Get session title for task context
-        const sessionTitle = await client.session
+        // Get session info
+        const session = await client.session
           .get({
             path: { id: sessionID },
           })
-          .then((data) => data.data?.title);
+          .then((data) => data.data);
+
+        // Skip notifications for subagents (sessions with a parent)
+        if (session?.parentID) {
+          return;
+        }
+
+        // Get session title for task context
+        const sessionTitle = session?.title;
 
         // Prepare notification content
         const projectName = project.id.split("/").pop() || "Unknown";
@@ -71,7 +79,7 @@ export const NotificationPlugin: Plugin = async ({
 
         try {
           // Play bell sound first
-          await playBellSound($);
+          await playBellSound($, sessionTitle);
 
           if (platform === "darwin") {
             // macOS
