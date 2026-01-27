@@ -178,6 +178,120 @@ stow zsh tmux git gh lazygit scripts alacritty kitty yabai skhd karabiner
 
 ---
 
+### Connecting to a Remote Server
+
+Steps for setting up SSH access to a new server.
+
+#### 1. Generate SSH Key (if not exists)
+
+```bash
+ssh-keygen -t ed25519 -C "your-email@example.com"
+```
+
+#### 2. Copy SSH Key to Server
+
+```bash
+ssh-copy-id -i ~/.ssh/id_ed25519.pub user@remote
+```
+
+#### 3. Test Connection
+
+```bash
+ssh user@remote
+```
+
+#### 4. Create Non-Root User (if needed)
+
+```bash
+# On the server as root
+sudo adduser username
+sudo usermod -aG sudo username
+
+# Switch to new user
+su - username
+```
+
+#### 5. Port Tunneling
+
+```bash
+# Forward remote port to local (access remote:3000 at localhost:3001)
+ssh -N -L 3001:localhost:3000 user@remote
+
+# Reverse tunnel (expose local:3001 on remote:3000)
+ssh -N -R 3000:localhost:3001 user@remote
+
+# Run in background with -f
+ssh -f -N -L 3000:localhost:3000 user@remote
+```
+
+**Access remote dev server via local domain (e.g., HTTPS):**
+
+If your dev server uses a local domain like `https://local.example.com:3000`:
+
+1. Run the dev server on the VPS (port 3000)
+2. Tunnel the port: `ssh -N -L 3000:localhost:3000 user@remote`
+3. Ensure `/etc/hosts` on your Mac has: `127.0.0.1 local.example.com`
+4. Access `https://local.example.com:3000` locally
+
+---
+
+### Git SSH Authentication
+
+Set up SSH keys for GitHub/GitLab to avoid entering passwords.
+
+#### 1. Generate SSH Key
+
+```bash
+ssh-keygen -t ed25519 -C "your-email@example.com"
+```
+
+#### 2. Start SSH Agent and Add Key
+
+```bash
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+```
+
+#### 3. Copy Public Key
+
+```bash
+# macOS
+pbcopy < ~/.ssh/id_ed25519.pub
+
+# Linux
+cat ~/.ssh/id_ed25519.pub
+# Then copy the output manually
+```
+
+#### 4. Add Key to GitHub/GitLab
+
+- **GitHub:** Settings > SSH and GPG keys > New SSH key
+- **GitLab:** Preferences > SSH Keys > Add new key
+
+Paste the public key and save.
+
+#### 5. Test Connection
+
+```bash
+ssh -T git@github.com
+# Should see: "Hi username! You've successfully authenticated..."
+
+ssh -T git@gitlab.com
+# Should see: "Welcome to GitLab, @username!"
+```
+
+#### 6. Use SSH URLs for Repos
+
+```bash
+# Clone with SSH
+git clone git@github.com:user/repo.git
+
+# Change existing repo from HTTPS to SSH
+git remote set-url origin git@github.com:user/repo.git
+```
+
+---
+
 ## Configuration Details
 
 ### ZSH
