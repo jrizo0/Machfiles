@@ -158,3 +158,16 @@ precmd() {
   fi
 }
 
+
+# send screenshot to vps
+send-screenshot() {
+  LATEST=$(ls -t ~/Desktop/Screenshot*.png 2>/dev/null | head -1)
+  if [ -z "$LATEST" ]; then
+    echo "No hay screenshots en Desktop"
+    return 1
+  fi
+  FILENAME="screenshot-$(date +%s).png"
+  scp "$LATEST" usuario@servidor:/tmp/$FILENAME
+  echo "Disponible en: /tmp/$FILENAME"
+}
+
