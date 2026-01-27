@@ -24,7 +24,7 @@ SERVER_PACKAGES=(zsh tmux git gh lazygit scripts)
 DESKTOP_PACKAGES=(alacritty kitty fontconfig)
 
 # Homebrew packages (CLI tools para ambos modos)
-BREW_PACKAGES=(fzf bat eza fd ripgrep zoxide lazygit delta fnm gh neovim stow tmux glow jq htop wget curl)
+BREW_PACKAGES=(fzf bat eza fd ripgrep zoxide lazygit delta fnm gh neovim stow tmux glow jq htop wget curl tree-sitter-cli)
 
 # APT packages esenciales
 APT_PACKAGES=(build-essential curl wget git stow zsh tmux jq htop tree unzip fontconfig)
@@ -186,6 +186,52 @@ install_uv() {
         success "uv installed"
     else
         warn "uv installation failed"
+    fi
+}
+
+install_bun() {
+    if command_exists bun; then
+        success "bun (already installed)"
+        return
+    fi
+
+    info "Installing bun..."
+    if curl -fsSL https://bun.sh/install | bash 2>/dev/null; then
+        export BUN_INSTALL="$HOME/.bun"
+        export PATH="$BUN_INSTALL/bin:$PATH"
+        success "bun installed"
+    else
+        warn "bun installation failed"
+    fi
+}
+
+install_pnpm() {
+    if command_exists pnpm; then
+        success "pnpm (already installed)"
+        return
+    fi
+
+    info "Installing pnpm..."
+    if curl -fsSL https://get.pnpm.io/install.sh | sh - 2>/dev/null; then
+        export PNPM_HOME="$HOME/.local/share/pnpm"
+        export PATH="$PNPM_HOME:$PATH"
+        success "pnpm installed"
+    else
+        warn "pnpm installation failed"
+    fi
+}
+
+install_claude_code() {
+    if command_exists claude; then
+        success "claude code (already installed)"
+        return
+    fi
+
+    info "Installing Claude Code..."
+    if curl -fsSL https://claude.ai/install.sh | bash 2>/dev/null; then
+        success "claude code installed"
+    else
+        warn "claude code installation failed"
     fi
 }
 
@@ -419,6 +465,9 @@ setup_server() {
     install_brew_packages
     install_fnm
     install_uv
+    install_bun
+    install_pnpm
+    install_claude_code
 
     echo ""
     info "--- Applying Dotfiles ---"
@@ -449,6 +498,9 @@ setup_desktop() {
     install_brew_packages
     install_fnm
     install_uv
+    install_bun
+    install_pnpm
+    install_claude_code
 
     echo ""
     info "--- Applying Dotfiles ---"
