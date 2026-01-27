@@ -167,7 +167,8 @@ send-screenshot() {
     return 1
   fi
   FILENAME="screenshot-$(date +%s).png"
-  scp "$LATEST" usuario@servidor:/tmp/$FILENAME
+  scp "$LATEST" jrizo@100.107.255.126:/tmp/$FILENAME
+  echo "/tmp/$FILENAME" | pbcopy
   echo "Disponible en: /tmp/$FILENAME"
 }
 
