@@ -1,143 +1,581 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# setup.sh - Dotfiles setup para Ubuntu 22.04+
+# Usage: ./setup.sh --server | --desktop | -h
 
-set -e  # Exit on any error
+set -euo pipefail
 
-echo "🚀 Minimal Linux Setup Script"
-echo "=============================="
-echo "This script will set up the essential development environment"
-echo ""
+# ══════════════════════════════════════════════════════════
+# VARIABLES Y COLORES
+# ══════════════════════════════════════════════════════════
 
-# Colors for output
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+BACKUP_DIR="$HOME/.dotfiles-backup-$(date +%Y%m%d-%H%M%S)"
+MODE=""
+
+# Colores
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-print_status() {
-    echo -e "${BLUE}[INFO]${NC} $1"
+# Stow packages por modo
+SERVER_PACKAGES=(zsh tmux git gh lazygit scripts)
+DESKTOP_PACKAGES=(alacritty kitty fontconfig)
+
+# Homebrew packages (CLI tools para ambos modos)
+BREW_PACKAGES=(fzf bat eza fd ripgrep zoxide lazygit delta fnm gh neovim stow tmux glow jq htop wget curl)
+
+# APT packages esenciales
+APT_PACKAGES=(build-essential curl wget git stow zsh tmux jq htop tree unzip fontconfig)
+
+# ══════════════════════════════════════════════════════════
+# FUNCIONES DE UTILIDAD
+# ══════════════════════════════════════════════════════════
+
+info() {
+    echo -e "${BLUE}::${NC} $1"
 }
 
-print_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
+success() {
+    echo -e "${GREEN}✓${NC} $1"
 }
 
-print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
+warn() {
+    echo -e "${YELLOW}✗${NC} $1"
 }
 
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
+error() {
+    echo -e "${RED}✗${NC} $1"
 }
 
-# Check if running on Linux
-if [[ "$OSTYPE" != "linux-gnu"* ]]; then
-    print_error "This script is designed for Linux systems only."
-    exit 1
-fi
+command_exists() {
+    command -v "$1" &>/dev/null
+}
 
-# Ensure we're in the right directory
-if [[ ! -f "./programs/packages.list" ]]; then
-    print_error "Please run this script from your dotfiles directory"
-    print_status "Run: cd ~/.dotfiles && ./programs/setup-minimal.sh"
-    exit 1
-fi
-
-print_status "Starting minimal Linux setup..."
-echo ""
-
-# Step 1: Update system and install essential packages
-print_status "Step 1/5: Installing essential packages..."
-sudo apt update
-sudo apt install -y build-essential curl wget git stow zsh tmux
-
-# Install packages from list
-if [[ -f "programs/packages.list" ]]; then
-    print_status "Installing packages from packages.list..."
-    sudo apt install -y $(grep -v '^#' programs/packages.list | grep -v '^$' | tr '\n' ' ')
-    print_success "✓ Packages installed"
-else
-    print_warning "packages.list not found, skipping package installation"
-fi
-
-echo ""
-
-# Step 2: Apply all dotfiles with stow
-print_status "Step 2/5: Setting up dotfiles with stow..."
-print_status "Applying all configurations with: stow */"
-stow */
-print_success "✓ All dotfiles linked"
-
-echo ""
-
-# Step 3: Setup ZSH
-print_status "Step 3/5: Setting up ZSH..."
-
-# Install Zap ZSH plugin manager
-if [[ ! -d "$HOME/.local/share/zap" ]]; then
-    print_status "Installing Zap ZSH plugin manager..."
-    zsh <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/install.zsh) --branch release-v1
-    print_success "✓ Zap installed"
-else
-    print_success "✓ Zap already installed"
-fi
-
-# Change default shell to zsh
-current_shell=$(echo $SHELL)
-if [[ "$current_shell" != *"zsh"* ]]; then
-    read -p "Do you want to set ZSH as your default shell? (y/n): " -n 1 -r
-    echo ""
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        chsh -s $(which zsh)
-        print_success "✓ Default shell changed to ZSH (restart terminal to take effect)"
+backup_if_exists() {
+    local target="$1"
+    if [[ -e "$target" || -L "$target" ]]; then
+        mkdir -p "$BACKUP_DIR"
+        mv "$target" "$BACKUP_DIR/"
+        info "Backed up: $target -> $BACKUP_DIR/"
     fi
-else
-    print_success "✓ ZSH is already your default shell"
-fi
+}
 
-echo ""
+# ══════════════════════════════════════════════════════════
+# FUNCIONES DE VERIFICACION
+# ══════════════════════════════════════════════════════════
 
-# Step 4: Setup Tmux plugins
-print_status "Step 4/5: Setting up Tmux..."
+check_ubuntu() {
+    if [[ ! -f /etc/os-release ]]; then
+        error "Cannot detect OS. This script requires Ubuntu 22.04+"
+        exit 1
+    fi
 
-if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
-    print_status "Installing TPM (Tmux Plugin Manager)..."
-    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-    print_success "✓ TPM installed"
-else
-    print_success "✓ TPM already installed"
-fi
+    source /etc/os-release
 
-echo ""
+    if [[ "$ID" != "ubuntu" ]]; then
+        error "This script is designed for Ubuntu. Detected: $ID"
+        exit 1
+    fi
 
-# Step 5: Make scripts executable
-print_status "Step 5/5: Setting up scripts..."
+    local version="${VERSION_ID%%.*}"
+    if [[ "$version" -lt 22 ]]; then
+        error "Ubuntu 22.04+ required. Detected: $VERSION_ID"
+        exit 1
+    fi
 
-if [[ -d "scripts/.local/bin" ]]; then
-    print_status "Making scripts executable..."
-    chmod +x scripts/.local/bin/*
-    print_success "✓ Scripts are executable"
-else
-    print_warning "scripts/.local/bin directory not found"
-fi
+    success "Ubuntu $VERSION_ID detected"
+}
 
-echo ""
+check_dotfiles_dir() {
+    if [[ ! -d "$DOTFILES_DIR/zsh" ]]; then
+        error "Cannot find dotfiles. Run from dotfiles directory."
+        exit 1
+    fi
+    success "Dotfiles directory: $DOTFILES_DIR"
+}
 
-echo "=============================="
-print_success "🎉 Minimal setup complete!"
-echo "=============================="
-echo ""
-print_status "What was set up:"
-echo "✓ Essential packages (git, stow, zsh, tmux, etc.)"
-echo "✓ All dotfiles linked via stow"
-echo "✓ ZSH with Zap plugin manager"
-echo "✓ Tmux with TPM"
-echo "✓ Scripts made executable"
-echo ""
-print_warning "Important next steps:"
-echo "1. Restart your terminal to load new shell and configurations"
-echo "2. If you changed your shell to ZSH, log out and back in"
-echo "3. Start tmux and press 'Ctrl+a I' to install tmux plugins"
-echo "4. Source your shell config: source ~/.zshrc"
-echo ""
-print_status "Your minimal development environment is ready! 🚀"
+# ══════════════════════════════════════════════════════════
+# FUNCIONES DE INSTALACION
+# ══════════════════════════════════════════════════════════
+
+install_apt_packages() {
+    info "Updating apt and installing base packages..."
+
+    sudo apt update -qq
+
+    for pkg in "${APT_PACKAGES[@]}"; do
+        if dpkg -s "$pkg" &>/dev/null; then
+            success "$pkg (already installed)"
+        else
+            if sudo apt install -y -qq "$pkg" 2>/dev/null; then
+                success "$pkg"
+            else
+                warn "$pkg (failed to install)"
+            fi
+        fi
+    done
+}
+
+install_homebrew() {
+    if command_exists brew; then
+        success "Homebrew (already installed)"
+        return
+    fi
+
+    info "Installing Homebrew..."
+    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+    # Add to current session
+    if [[ -d /home/linuxbrew/.linuxbrew ]]; then
+        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+    fi
+
+    success "Homebrew installed"
+}
+
+install_brew_packages() {
+    info "Installing CLI tools via Homebrew..."
+
+    for pkg in "${BREW_PACKAGES[@]}"; do
+        if brew list "$pkg" &>/dev/null; then
+            success "$pkg (already installed)"
+        else
+            if brew install "$pkg" 2>/dev/null; then
+                success "$pkg"
+            else
+                warn "$pkg (failed to install)"
+            fi
+        fi
+    done
+}
+
+install_fnm() {
+    if command_exists fnm; then
+        success "fnm (already installed)"
+    else
+        info "Installing fnm..."
+        if brew install fnm 2>/dev/null; then
+            success "fnm installed"
+        else
+            warn "fnm installation failed"
+            return
+        fi
+    fi
+
+    # Install Node LTS
+    info "Installing Node.js LTS via fnm..."
+    eval "$(fnm env)"
+    if fnm install --lts 2>/dev/null; then
+        fnm default lts-latest
+        success "Node.js LTS installed"
+    else
+        warn "Node.js LTS installation failed"
+    fi
+}
+
+install_uv() {
+    if command_exists uv; then
+        success "uv (already installed)"
+        return
+    fi
+
+    info "Installing uv (Python manager)..."
+    if curl -LsSf https://astral.sh/uv/install.sh | sh 2>/dev/null; then
+        success "uv installed"
+    else
+        warn "uv installation failed"
+    fi
+}
+
+install_nerd_fonts() {
+    local font_dir="$HOME/.local/share/fonts"
+    local font_name="JetBrainsMono"
+
+    if fc-list | grep -qi "JetBrainsMono Nerd Font"; then
+        success "JetBrainsMono Nerd Font (already installed)"
+        return
+    fi
+
+    info "Installing JetBrainsMono Nerd Font..."
+    mkdir -p "$font_dir"
+
+    local tmp_dir=$(mktemp -d)
+    local release_url="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/${font_name}.zip"
+
+    if curl -fsSL "$release_url" -o "$tmp_dir/${font_name}.zip" 2>/dev/null; then
+        unzip -q "$tmp_dir/${font_name}.zip" -d "$font_dir/${font_name}NerdFont" 2>/dev/null || true
+        fc-cache -f "$font_dir"
+        rm -rf "$tmp_dir"
+        success "JetBrainsMono Nerd Font installed"
+    else
+        warn "Font download failed"
+        rm -rf "$tmp_dir"
+    fi
+}
+
+setup_zsh() {
+    info "Setting up ZSH..."
+
+    # Install Zap plugin manager
+    if [[ -d "$HOME/.local/share/zap" ]]; then
+        success "Zap plugin manager (already installed)"
+    else
+        info "Installing Zap plugin manager..."
+        if zsh <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/install.zsh) --branch release-v1 --keep 2>/dev/null; then
+            success "Zap installed"
+        else
+            warn "Zap installation failed"
+        fi
+    fi
+
+    # Change default shell
+    local current_shell
+    current_shell=$(getent passwd "$USER" | cut -d: -f7)
+
+    if [[ "$current_shell" == *"zsh"* ]]; then
+        success "ZSH is default shell"
+    else
+        info "Changing default shell to ZSH..."
+        if sudo chsh -s "$(which zsh)" "$USER" 2>/dev/null; then
+            success "Default shell changed to ZSH"
+        else
+            warn "Could not change shell (run: chsh -s \$(which zsh))"
+        fi
+    fi
+}
+
+setup_tmux_plugins() {
+    local tpm_dir="$HOME/.tmux/plugins/tpm"
+
+    if [[ -d "$tpm_dir" ]]; then
+        success "TPM (already installed)"
+        return
+    fi
+
+    info "Installing TPM (Tmux Plugin Manager)..."
+    if git clone https://github.com/tmux-plugins/tpm "$tpm_dir" 2>/dev/null; then
+        success "TPM installed"
+    else
+        warn "TPM installation failed"
+    fi
+}
+
+setup_ssh_keys() {
+    local ssh_key="$HOME/.ssh/id_ed25519"
+
+    if [[ -f "$ssh_key" ]]; then
+        success "SSH key exists: $ssh_key"
+        return
+    fi
+
+    info "Generating SSH key (ed25519)..."
+    mkdir -p "$HOME/.ssh"
+    chmod 700 "$HOME/.ssh"
+
+    read -rp "Enter email for SSH key: " ssh_email
+    if [[ -n "$ssh_email" ]]; then
+        ssh-keygen -t ed25519 -C "$ssh_email" -f "$ssh_key" -N ""
+        eval "$(ssh-agent -s)" &>/dev/null
+        ssh-add "$ssh_key" 2>/dev/null
+        success "SSH key generated"
+        info "Public key:"
+        cat "${ssh_key}.pub"
+        echo ""
+    else
+        warn "Skipped SSH key generation"
+    fi
+}
+
+setup_git_config() {
+    info "Configuring Git..."
+
+    local current_name current_email
+    current_name=$(git config --global user.name 2>/dev/null || echo "")
+    current_email=$(git config --global user.email 2>/dev/null || echo "")
+
+    if [[ -n "$current_name" && -n "$current_email" ]]; then
+        success "Git configured: $current_name <$current_email>"
+        return
+    fi
+
+    read -rp "Enter Git user.name: " git_name
+    read -rp "Enter Git user.email: " git_email
+
+    if [[ -n "$git_name" ]]; then
+        git config --global user.name "$git_name"
+    fi
+    if [[ -n "$git_email" ]]; then
+        git config --global user.email "$git_email"
+    fi
+
+    success "Git configured"
+}
+
+setup_gh_auth() {
+    if gh auth status &>/dev/null; then
+        success "GitHub CLI (already authenticated)"
+        return
+    fi
+
+    info "Authenticating GitHub CLI..."
+    echo "Running: gh auth login"
+    gh auth login || warn "GitHub CLI authentication skipped"
+}
+
+apply_stow_packages() {
+    local packages=("$@")
+
+    info "Applying dotfiles with stow..."
+    cd "$DOTFILES_DIR"
+
+    for pkg in "${packages[@]}"; do
+        if [[ -d "$pkg" ]]; then
+            # Backup existing configs
+            case "$pkg" in
+                zsh)
+                    backup_if_exists "$HOME/.zshrc"
+                    backup_if_exists "$HOME/.zshenv"
+                    ;;
+                tmux)
+                    backup_if_exists "$HOME/.tmux.conf"
+                    ;;
+                git)
+                    backup_if_exists "$HOME/.gitconfig"
+                    ;;
+                alacritty)
+                    backup_if_exists "$HOME/.config/alacritty"
+                    ;;
+                kitty)
+                    backup_if_exists "$HOME/.config/kitty"
+                    ;;
+            esac
+
+            if stow -v "$pkg" 2>/dev/null; then
+                success "stow: $pkg"
+            else
+                warn "stow: $pkg (conflict or error)"
+            fi
+        else
+            warn "stow: $pkg (not found)"
+        fi
+    done
+}
+
+setup_scripts() {
+    local scripts_dir="$DOTFILES_DIR/scripts/.local/bin"
+
+    if [[ -d "$scripts_dir" ]]; then
+        chmod +x "$scripts_dir"/* 2>/dev/null || true
+        success "Scripts made executable"
+    fi
+}
+
+install_vscode_extensions() {
+    if ! command_exists code; then
+        warn "VSCode not installed, skipping extensions"
+        return
+    fi
+
+    info "Installing VSCode extensions..."
+    local extensions=(
+        "vscodevim.vim"
+        "pkief.material-icon-theme"
+        "esbenp.prettier-vscode"
+        "dbaeumer.vscode-eslint"
+        "bradlc.vscode-tailwindcss"
+    )
+
+    for ext in "${extensions[@]}"; do
+        if code --list-extensions | grep -qi "$ext"; then
+            success "$ext (already installed)"
+        else
+            if code --install-extension "$ext" &>/dev/null; then
+                success "$ext"
+            else
+                warn "$ext (failed)"
+            fi
+        fi
+    done
+}
+
+# ══════════════════════════════════════════════════════════
+# FUNCIONES PRINCIPALES
+# ══════════════════════════════════════════════════════════
+
+setup_server() {
+    echo ""
+    info "=== Server Mode Setup ==="
+    echo ""
+
+    check_ubuntu
+    check_dotfiles_dir
+
+    echo ""
+    info "--- Installing Packages ---"
+    install_apt_packages
+    install_homebrew
+    install_brew_packages
+    install_fnm
+    install_uv
+
+    echo ""
+    info "--- Applying Dotfiles ---"
+    apply_stow_packages "${SERVER_PACKAGES[@]}"
+    setup_scripts
+
+    echo ""
+    info "--- Configuring Tools ---"
+    setup_zsh
+    setup_tmux_plugins
+    setup_ssh_keys
+    setup_git_config
+    setup_gh_auth
+}
+
+setup_desktop() {
+    echo ""
+    info "=== Desktop Mode Setup ==="
+    echo ""
+
+    check_ubuntu
+    check_dotfiles_dir
+
+    echo ""
+    info "--- Installing Packages ---"
+    install_apt_packages
+    install_homebrew
+    install_brew_packages
+    install_fnm
+    install_uv
+
+    echo ""
+    info "--- Applying Dotfiles ---"
+    apply_stow_packages "${SERVER_PACKAGES[@]}" "${DESKTOP_PACKAGES[@]}"
+    setup_scripts
+
+    echo ""
+    info "--- Configuring Tools ---"
+    setup_zsh
+    setup_tmux_plugins
+    setup_ssh_keys
+    setup_git_config
+    setup_gh_auth
+
+    echo ""
+    info "--- Desktop Extras ---"
+    install_nerd_fonts
+    install_vscode_extensions
+}
+
+# ══════════════════════════════════════════════════════════
+# AYUDA Y ARGUMENTOS
+# ══════════════════════════════════════════════════════════
+
+show_help() {
+    cat << EOF
+Dotfiles Setup for Ubuntu 22.04+
+
+Usage: ./setup.sh [OPTION]
+
+Options:
+  --server    Install CLI-only setup (no GUI apps or fonts)
+              Stow: zsh, tmux, git, gh, lazygit, scripts
+
+  --desktop   Full workstation setup (includes GUI apps)
+              Everything from --server plus:
+              Stow: alacritty, kitty, fontconfig
+              Extras: Nerd Fonts, VSCode extensions
+
+  -h, --help  Show this help message
+
+Examples:
+  ./setup.sh --server   # For servers/containers
+  ./setup.sh --desktop  # For workstations with GUI
+
+What gets installed (both modes):
+  - Homebrew (Linux)
+  - CLI tools: fzf, bat, eza, fd, ripgrep, zoxide, lazygit, delta
+  - fnm + Node.js LTS
+  - uv (Python manager)
+  - ZSH + Zap plugin manager
+  - TPM (Tmux plugins)
+  - SSH key generation (ed25519)
+  - Git user configuration
+  - GitHub CLI authentication
+
+Backups:
+  Existing configs are backed up to ~/.dotfiles-backup-YYYYMMDD-HHMMSS
+
+EOF
+}
+
+parse_args() {
+    if [[ $# -eq 0 ]]; then
+        error "No mode specified. Use --server or --desktop"
+        echo ""
+        show_help
+        exit 1
+    fi
+
+    case "$1" in
+        --server)
+            MODE="server"
+            ;;
+        --desktop)
+            MODE="desktop"
+            ;;
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        *)
+            error "Unknown option: $1"
+            echo ""
+            show_help
+            exit 1
+            ;;
+    esac
+}
+
+# ══════════════════════════════════════════════════════════
+# MAIN
+# ══════════════════════════════════════════════════════════
+
+main() {
+    parse_args "$@"
+
+    echo ""
+    echo "Dotfiles Setup - Ubuntu"
+    echo "========================"
+
+    case "$MODE" in
+        server)
+            setup_server
+            ;;
+        desktop)
+            setup_desktop
+            ;;
+    esac
+
+    echo ""
+    echo "========================"
+    success "Setup complete!"
+    echo ""
+
+    if [[ -d "$BACKUP_DIR" ]]; then
+        info "Backups saved to: $BACKUP_DIR"
+    fi
+
+    echo ""
+    info "Next steps:"
+    echo "  1. Restart terminal or run: exec zsh"
+    echo "  2. Start tmux and press Ctrl+a I to install plugins"
+    if [[ "$MODE" == "desktop" ]]; then
+        echo "  3. Set terminal font to 'JetBrainsMono Nerd Font'"
+    fi
+    echo ""
+}
+
+main "$@"
