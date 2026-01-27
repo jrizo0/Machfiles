@@ -18,12 +18,12 @@ return {
       }
       ts.install(parsers)
 
-      -- Habilitar highlighting e indentacion por FileType
+      -- Habilitar highlighting para cualquier archivo con parser disponible
       vim.api.nvim_create_autocmd('FileType', {
-        pattern = parsers,
         callback = function()
-          vim.treesitter.start()
-          vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          if pcall(vim.treesitter.start) then
+            vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end
         end,
       })
     end,

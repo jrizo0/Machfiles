@@ -38,27 +38,26 @@ return {
           -- 'gopls',
           'lua_ls',
         },
-      }
-      require('mason-lspconfig').setup_handlers {
-        function(server_name) -- default handler (optional)
-          require('lspconfig')[server_name].setup {}
-        end,
-        ['vtsls'] = function()
-          require('lspconfig').vtsls.setup {
-            root_dir = require('lspconfig').util.root_pattern('.git', 'pnpm-workspace.yaml', 'pnpm-lock.yaml', 'yarn.lock', 'package-lock.json', 'bun.lockb'),
-            typescript = {
-              tsserver = {
-                -- maxTsServerMemory = 12288,
-                maxTsServerMemory = 1024,
+        handlers = {
+          function(server_name)
+            require('lspconfig')[server_name].setup {}
+          end,
+          ['vtsls'] = function()
+            require('lspconfig').vtsls.setup {
+              root_dir = require('lspconfig').util.root_pattern('.git', 'pnpm-workspace.yaml', 'pnpm-lock.yaml', 'yarn.lock', 'package-lock.json', 'bun.lockb'),
+              typescript = {
+                tsserver = {
+                  maxTsServerMemory = 1024,
+                },
               },
-            },
-            experimental = {
-              completion = {
-                entriesLimit = 3,
+              experimental = {
+                completion = {
+                  entriesLimit = 3,
+                },
               },
-            },
-          }
-        end,
+            }
+          end,
+        },
       }
 
       vim.api.nvim_create_user_command('LspToggle', function()
