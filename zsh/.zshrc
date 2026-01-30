@@ -172,3 +172,14 @@ send-screenshot() {
   echo "Disponible en: /tmp/$FILENAME"
 }
 
+# Cargar secretos si existen
+[[ -f ~/.secrets ]] && source ~/.secrets
+
+# Función que usa las variables
+notify() {
+  local msg="${1:-Tarea completada}"
+  [[ -z "$TELEGRAM_BOT_TOKEN" ]] && echo "Falta TELEGRAM_BOT_TOKEN" && return 1
+  curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+    -d "chat_id=${TELEGRAM_CHAT_ID}" \
+    -d "text=$msg" > /dev/null
+  }
