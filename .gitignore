@@ -4,4 +4,5 @@ getnf/
 lazygit/.config/lazygit
 **/node_modules/
 .DS_Store
-gh/.config/gh/hosts.yml
+
+**/gh/**/hosts.yml

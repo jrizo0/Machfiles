@@ -101,7 +101,7 @@ fpath+=~/.zfunc
 PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome":$PATH
 
 cc(){
-  claude --dangerously-skip-permissions
+  CLAUDE_CODE_NO_FLICKER=1 claude --dangerously-skip-permissions
 }
 
 export PATH="$HOME/.local/bin:$PATH"
