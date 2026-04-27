@@ -178,3 +178,5 @@ if [ -f '/Users/jrizo/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/jrizo/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/jrizo/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
+
+[ -f "$HOME/.zshrc.secrets" ] && source "$HOME/.zshrc.secrets"
