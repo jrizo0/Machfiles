@@ -22,27 +22,30 @@ size = 14
 # ligatures = true
 
 [font.normal]
-family = "JetBrainsMono Nerd Font"
+# family = "JetBrainsMono Nerd Font"
 # family = "JetBrainsMono Nerd Font Mono"
 # family = "monospace"
 # family = "DankMono Nerd Font Mono"
 # family = "FiraCode Nerd Font Mono"
+family = "GeistMono Nerd Font"
 style = "Regular"
 
 [font.bold]
-family = "JetBrainsMono Nerd Font"
+# family = "JetBrainsMono Nerd Font"
 # family = "JetBrainsMono Nerd Font Mono"
 # family = "monospace" 
 # family = "DankMono Nerd Font Mono"
 # family = "FiraCode Nerd Font Mono"
+family = "GeistMono Nerd Font"
 style = "Bold"
 
 [font.italic]
-family = "JetBrainsMono Nerd Font"
+# family = "JetBrainsMono Nerd Font"
 # family = "JetBrainsMono Nerd Font Mono"
 # family = "monospace"
 # family = "DankMono Nerd Font Mono"  
 # family = "FiraCode Nerd Font Mono"
+family = "GeistMono Nerd Font"
 style = "Italic"
 
 [font.offset]
