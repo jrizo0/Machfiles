@@ -10,9 +10,10 @@ return {
       keymap('n', 'Q', ":lua require('bufdelete').bufdelete(0, false)<cr>", opts)
     end,
   },
-  { 'windwp/nvim-ts-autotag', opts = {} },
+  { 'windwp/nvim-ts-autotag', event = 'InsertEnter', opts = {} },
   {
     'stevearc/dressing.nvim',
+    event = 'VeryLazy',
     dependencies = { 'MunifTanjim/nui.nvim' },
     opts = {},
     config = function()
@@ -33,6 +34,7 @@ return {
   },
   {
     'karb94/neoscroll.nvim',
+    event = 'VeryLazy',
     config = function()
       require('neoscroll').setup {
         stop_eof = true,
@@ -59,7 +61,7 @@ return {
       }
     end,
   },
-  { 'folke/neodev.nvim', opts = {} },
+  { 'folke/neodev.nvim', lazy = true, opts = {} },
   -- {
   --   'echasnovski/mini.pairs',
   --   event = 'VeryLazy',
@@ -98,12 +100,14 @@ return {
   },
   {
     'LunarVim/breadcrumbs.nvim',
+    event = 'VeryLazy',
     config = function()
       require('breadcrumbs').setup()
     end,
   },
   {
     'SmiteshP/nvim-navic',
+    event = 'VeryLazy',
     config = function()
       local icons = require 'config.icons'
       require('nvim-navic').setup {
@@ -150,6 +154,7 @@ return {
   {
     'utilyre/barbecue.nvim',
     name = 'barbecue',
+    event = 'VeryLazy',
     version = '*',
     opts = {
       -- configurations go here
@@ -186,14 +191,14 @@ return {
   {
     'JoosepAlviste/nvim-ts-context-commentstring',
     lazy = true,
-    opts = {},
-    config = function()
-      require('nvim-treesitter.configs').setup {
-        enable_autocmd = false,
-      }
+    -- Standalone API (nvim-treesitter `main` branch removed `nvim-treesitter.configs`).
+    -- `opts` makes lazy auto-run require('ts_context_commentstring').setup(opts).
+    init = function()
+      vim.g.skip_ts_context_commentstring_module = true
     end,
+    opts = { enable_autocmd = false },
   },
-  { 'tpope/vim-commentary' },
+  -- vim-commentary removed: redundant with mini.comment + built-in `gc`.
   {
     'echasnovski/mini.comment',
     event = 'VeryLazy',

@@ -1,3 +1,7 @@
+-- Enable Neovim's Lua module bytecode cache (0.9+). Biggest single startup win,
+-- especially on a cold filesystem cache (first launch after reboot / on the VPS).
+vim.loader.enable()
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
@@ -40,6 +44,7 @@ require('lazy').setup({
   {
     -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
+    event = { 'BufReadPre', 'BufNewFile' },
     opts = {
       -- See `:help gitsigns.txt`
       signs = {
@@ -109,8 +114,9 @@ require('lazy').setup({
     },
   },
 
-  -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
+  -- NOTE: commenting handled by Neovim's built-in `gc`/`gcc` (0.10+) plus
+  -- mini.comment + nvim-ts-context-commentstring (see more.lua) for JSX/TSX-aware
+  -- commentstrings. Comment.nvim removed to avoid conflicting `gc` keymaps.
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
@@ -125,7 +131,23 @@ require('lazy').setup({
   --
   --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
   { import = 'custom.plugins' },
-}, {})
+}, {
+  -- Disable built-in runtime plugins that aren't used. Trims the runtimepath scan
+  -- and avoids sourcing these on every startup (helps most on a cold disk cache).
+  performance = {
+    rtp = {
+      disabled_plugins = {
+        'gzip',
+        'tarPlugin',
+        'zipPlugin',
+        'tohtml',
+        'tutor',
+        'rplugin',
+        -- NOTE: netrw kept on purpose: `<leader>pv` (:Sex!) in keymaps.lua uses it.
+      },
+    },
+  },
+})
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
