@@ -10,6 +10,41 @@ return {
     config = function()
       local lspconfig_defaults = require('lspconfig').util.default_config
       lspconfig_defaults.capabilities = vim.tbl_deep_extend('force', lspconfig_defaults.capabilities, require('cmp_nvim_lsp').default_capabilities())
+
+      -- mason-lspconfig v2 habilita servidores vía vim.lsp.enable(), que NO lee
+      -- lspconfig_defaults: los overrides por servidor van con vim.lsp.config().
+      vim.lsp.config('*', {
+        capabilities = require('cmp_nvim_lsp').default_capabilities(),
+      })
+
+      -- FIX congelamiento: nvim-lspconfig fuerza dynamicRegistration=true para
+      -- tailwindcss, que registra file-watchers sobre todo el workspace. Sin
+      -- inotifywait instalado, Neovim los implementa crawleando el árbol completo
+      -- (node_modules, .git, .repos...) en Lua en el hilo principal -> el editor
+      -- queda congelado ~1-2 min al abrir cualquier buffer al que tailwind se
+      -- adjunta (incluye markdown). Apagarlo: tailwind pierde solo la
+      -- auto-detección de cambios en tailwind.config (reiniciable con :LspRestart).
+      vim.lsp.config('tailwindcss', {
+        capabilities = {
+          workspace = { didChangeWatchedFiles = { dynamicRegistration = false } },
+        },
+      })
+
+      -- Config de vtsls migrada aquí: el bloque `handlers` de mason-lspconfig v2
+      -- ya no existe, así que lo que había ahí se ignoraba silenciosamente.
+      vim.lsp.config('vtsls', {
+        root_markers = { 'pnpm-workspace.yaml', 'pnpm-lock.yaml', 'yarn.lock', 'package-lock.json', 'bun.lockb', '.git' },
+        settings = {
+          typescript = {
+            tsserver = { maxTsServerMemory = 1024 },
+          },
+          vtsls = {
+            experimental = {
+              completion = { entriesLimit = 3 },
+            },
+          },
+        },
+      })
       vim.api.nvim_create_autocmd('LspAttach', {
         desc = 'LSP actions',
         callback = function(event)
@@ -39,26 +74,9 @@ return {
           -- 'gopls',
           'lua_ls',
         },
-        handlers = {
-          function(server_name)
-            require('lspconfig')[server_name].setup {}
-          end,
-          ['vtsls'] = function()
-            require('lspconfig').vtsls.setup {
-              root_dir = require('lspconfig').util.root_pattern('.git', 'pnpm-workspace.yaml', 'pnpm-lock.yaml', 'yarn.lock', 'package-lock.json', 'bun.lockb'),
-              typescript = {
-                tsserver = {
-                  maxTsServerMemory = 1024,
-                },
-              },
-              experimental = {
-                completion = {
-                  entriesLimit = 3,
-                },
-              },
-            }
-          end,
-        },
+        -- NOTE: `handlers` fue eliminado en mason-lspconfig v2; los servidores se
+        -- habilitan solos (automatic_enable) y se configuran con vim.lsp.config()
+        -- arriba.
       }
 
       vim.api.nvim_create_user_command('LspToggle', function()
