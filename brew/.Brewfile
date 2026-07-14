@@ -144,7 +144,7 @@ cask "powerphotos"
 mas "Keynote", id: 409183694
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
-mas "Xcode", id: 497799835
+mas "Xcode", id: 497799835          # ~12GB de descarga — puede tardar mucho; comentar si no urge
 mas "WhatsApp", id: 310633997
 mas "Harvest", id: 506189836
 mas "KeyBell", id: 1530838633

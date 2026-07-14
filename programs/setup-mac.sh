@@ -5,7 +5,8 @@
 # Idempotente: se puede correr varias veces sin romper nada.
 # Orden recomendado en un Mac nuevo:
 #   1. Iniciar sesión en App Store (para las apps `mas`)
-#   2. git clone git@github.com:jrizo0/Machfiles.git ~/Machfiles  (o via https)
+#   2. git clone https://github.com/jrizo0/Machfiles.git ~/Machfiles
+#      (https, no ssh: la SSH key se genera después, dentro del script)
 #   3. cd ~/Machfiles && ./programs/setup-mac.sh
 
 set -euo pipefail
@@ -66,6 +67,18 @@ install_xcode_clt() {
     success "Xcode Command Line Tools instaladas"
 }
 
+install_rosetta() {
+    # Necesaria para apps Intel en Apple Silicon
+    [[ "$(uname -m)" == "arm64" ]] || return 0
+    if /usr/bin/pgrep -q oahd; then
+        success "Rosetta 2 (ya instalada)"
+        return
+    fi
+    info "Instalando Rosetta 2..."
+    softwareupdate --install-rosetta --agree-to-license \
+        && success "Rosetta 2 instalada" || warn "Rosetta 2 falló"
+}
+
 # ══════════════════════════════════════════════════════════
 # HOMEBREW
 # ══════════════════════════════════════════════════════════
@@ -90,8 +103,9 @@ run_brew_bundle() {
         return
     fi
 
-    info "Instalando fnm primero (los npm del Brewfile lo necesitan)..."
+    info "Instalando fnm y mas primero (el Brewfile los necesita durante el bundle)..."
     brew list fnm &>/dev/null || brew install fnm
+    brew list mas &>/dev/null || brew install mas
     eval "$(fnm env 2>/dev/null)" || true
     if ! command_exists node; then
         info "Instalando Node LTS via fnm..."
@@ -99,9 +113,10 @@ run_brew_bundle() {
         eval "$(fnm env)"
     fi
 
+    # `mas account` no funciona en todas las versiones de macOS; es solo informativo
     if ! mas account &>/dev/null; then
-        warn "No hay sesión en App Store — las líneas 'mas' del Brewfile fallarán."
-        warn "Inicia sesión en la app App Store y vuelve a correr: brew bundle --file=$DOTFILES_DIR/brew/.Brewfile"
+        warn "No se pudo verificar la sesión de App Store. Si las líneas 'mas' fallan,"
+        warn "inicia sesión en la app App Store y re-corre: brew bundle --file=$DOTFILES_DIR/brew/.Brewfile"
     fi
 
     info "Ejecutando brew bundle (esto tarda un buen rato)..."
@@ -305,7 +320,7 @@ EOF
 # ══════════════════════════════════════════════════════════
 
 show_help() {
-    sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'
     exit 0
 }
 
@@ -324,6 +339,7 @@ echo "════════════════════════"
 
 check_macos
 install_xcode_clt
+install_rosetta
 install_homebrew
 run_brew_bundle
 apply_stow_packages
