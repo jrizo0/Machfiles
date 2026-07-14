@@ -1,5 +1,16 @@
-scripts/.local/bin/rust-analyzer
-scripts/.local/bin
+# ~/.local/bin está foldeado aquí por stow: los instaladores (claude, codex,
+# cursor, etc.) tiran binarios/symlinks. Se ignora todo y se re-incluyen
+# explícitamente los scripts propios que sí deben viajar entre máquinas.
+scripts/.local/bin/*
+!scripts/.local/bin/getnf
+!scripts/.local/bin/git-clone-bare-for-worktrees
+!scripts/.local/bin/lvim
+!scripts/.local/bin/mysql2sqlite
+!scripts/.local/bin/tmux-sessionizer
+!scripts/.local/bin/tmux-windowizer
+!scripts/.local/bin/ss2vps
+!scripts/.local/bin/vpsjr-connect
+
 getnf/
 lazygit/.config/lazygit
 **/node_modules/

@@ -77,3 +77,7 @@ shift + alt - 0 : yabai -m window --space 10;
 ctrl + alt - q : yabai --stop-service
 ctrl + alt - s : yabai --start-service
 ctrl + alt - r : yabai --restart-service
+
+# -- Screenshot -> VPS (Claude Code) --
+# sube el screenshot del clipboard a vpsjr y pega la ruta en Alacritty
+cmd + shift - u : ~/.local/bin/ss2vps

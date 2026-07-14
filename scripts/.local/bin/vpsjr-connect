@@ -1,0 +1,217 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HOST="vpsjr"
+
+# Local port -> remote port
+declare -a TUNNELS=(
+  "3000:3000"
+  "3333:5432"
+  "4040:4040"
+  "5173:5173"
+  "3773:3773"
+)
+
+usage() {
+  cat <<EOF
+vpsjr-connect — manage SSH tunnels and connect to ${HOST}
+
+USAGE:
+  vpsjr-connect              Bring up tswork, open all SSH tunnels, and open a shell on ${HOST}
+  vpsjr-connect send <file>...  Copy one or more files to ${HOST}:/tmp/ with a timestamped name
+  vpsjr-connect bring <remote-path>... [--to <dir>]
+                             Fetch one or more files from ${HOST} (default into ~/Downloads)
+  vpsjr-connect tunnel <port|local:remote> [--kill]
+                             Open (or close with --kill) a single custom tunnel and exit
+  vpsjr-connect --kill       Tear down all SSH tunnels and exit
+  vpsjr-connect help         Show this help
+
+TUNNELS (local -> remote):
+$(for t in "${TUNNELS[@]}"; do echo "  ${t%%:*} -> ${t##*:}"; done)
+
+SEND:
+  Files are uploaded via scp to ${HOST}:/tmp/ and renamed with a
+  YYYYMMDD-HHMMSS timestamp, preserving the extension. Examples:
+    report.pdf -> /tmp/report-20260611-144700.pdf
+    dump       -> /tmp/dump-20260611-144700
+  Multiple files can be sent at once; non-file arguments are skipped.
+
+BRING:
+  Fetch one or more files from ${HOST} via scp into a local folder.
+  Defaults to ~/Downloads; override with --to (or -d) <dir>:
+    vpsjr-connect bring /tmp/report.pdf
+    vpsjr-connect bring "/tmp/plan v4.md" /tmp/data.csv
+    vpsjr-connect bring /tmp/report.pdf --to ~/Desktop
+  Remote paths are kept verbatim, so spaces/accents are fine.
+  The destination folder is created if it does not exist.
+
+TUNNEL:
+  Open a single tunnel for a custom port on demand, then exit (no shell).
+  Pass just a port to map it 1:1, or local:remote to map different ports:
+    vpsjr-connect tunnel 8080            8080 -> 8080
+    vpsjr-connect tunnel 8080:80         8080 -> 80
+  Add --kill to close that custom tunnel instead of opening it:
+    vpsjr-connect tunnel 8080 --kill
+EOF
+}
+
+# help: print usage and exit
+if [[ "${1:-}" == "help" || "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  usage
+  exit 0
+fi
+
+# send: copy one or more files to ${HOST}:/tmp/ with a timestamped name
+if [[ "${1:-}" == "send" ]]; then
+  shift
+  if [[ $# -eq 0 ]]; then
+    echo "Usage: vpsjr-connect send <file> [file...]" >&2
+    exit 1
+  fi
+
+  ts="$(date +%Y%m%d-%H%M%S)"
+  for f in "$@"; do
+    if [[ ! -f "$f" ]]; then
+      echo "  skipping '${f}': not a file" >&2
+      continue
+    fi
+    base="$(basename "$f")"
+    name="${base%.*}"
+    ext="${base##*.}"
+    if [[ "$base" == "$ext" ]]; then
+      # no extension
+      remote="${name}-${ts}"
+    else
+      remote="${name}-${ts}.${ext}"
+    fi
+    scp "$f" "${HOST}:/tmp/${remote}"
+    echo "  sent '${f}' -> ${HOST}:/tmp/${remote}"
+  done
+  exit 0
+fi
+
+# bring: fetch one or more files from ${HOST} into a local folder (default ~/Downloads)
+if [[ "${1:-}" == "bring" ]]; then
+  shift
+  dest="${HOME}/Downloads"
+  declare -a remotes=()
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --to|-d)
+        dest="${2:-}"
+        if [[ -z "$dest" ]]; then
+          echo "Usage: vpsjr-connect bring <remote-path>... [--to <dir>]" >&2
+          exit 1
+        fi
+        shift 2
+        ;;
+      *)
+        remotes+=("$1")
+        shift
+        ;;
+    esac
+  done
+
+  if [[ ${#remotes[@]} -eq 0 ]]; then
+    echo "Usage: vpsjr-connect bring <remote-path>... [--to <dir>]" >&2
+    exit 1
+  fi
+
+  # Expand a leading ~ in the destination (handles quoted "~/foo")
+  case "$dest" in
+    "~") dest="${HOME}" ;;
+    "~/"*) dest="${HOME}/${dest#\~/}" ;;
+  esac
+
+  mkdir -p "$dest"
+
+  for r in "${remotes[@]}"; do
+    # Modern scp (OpenSSH 9+) uses the SFTP protocol and treats the remote path
+    # literally, so pass it verbatim — spaces/accents need no extra quoting.
+    if scp "${HOST}:${r}" "${dest}/"; then
+      echo "  brought '${r}' -> ${dest}/$(basename "$r")"
+    else
+      echo "  failed to bring '${r}'" >&2
+    fi
+  done
+  exit 0
+fi
+
+# tunnel: open (or close with --kill) a single custom tunnel and exit
+if [[ "${1:-}" == "tunnel" ]]; then
+  shift
+  spec="${1:-}"
+  if [[ -z "$spec" ]]; then
+    echo "Usage: vpsjr-connect tunnel <port|local:remote> [--kill]" >&2
+    exit 1
+  fi
+
+  # Accept "port" (1:1) or "local:remote"
+  local_port="${spec%%:*}"
+  remote_port="${spec##*:}"
+
+  if ! [[ "$local_port" =~ ^[0-9]+$ && "$remote_port" =~ ^[0-9]+$ ]]; then
+    echo "Invalid port spec '${spec}'. Use <port> or <local:remote>." >&2
+    exit 1
+  fi
+
+  if [[ "${2:-}" == "--kill" ]]; then
+    if pgrep -f "ssh -N -L ${local_port}:localhost:${remote_port}" >/dev/null 2>&1; then
+      pkill -f "ssh -N -L ${local_port}:localhost:${remote_port}"
+      echo "  tunnel ${local_port}->${remote_port} closed"
+    else
+      echo "  tunnel ${local_port}->${remote_port} not running"
+    fi
+    exit 0
+  fi
+
+  if pgrep -f "ssh -N -L ${local_port}:localhost:${remote_port}" >/dev/null 2>&1; then
+    echo "  tunnel ${local_port}->${remote_port} already up, skipping"
+    exit 0
+  fi
+
+  ssh -N -L "${local_port}:localhost:${remote_port}" "${HOST}" -f
+  echo "  tunnel ${local_port}->${remote_port} up"
+  exit 0
+fi
+
+# --kill: tear down all tunnels and exit
+if [[ "${1:-}" == "--kill" ]]; then
+  echo "Closing SSH tunnels to ${HOST}..."
+  for t in "${TUNNELS[@]}"; do
+    local_port="${t%%:*}"
+    remote_port="${t##*:}"
+
+    if pgrep -f "ssh -N -L ${local_port}:localhost:${remote_port}" >/dev/null 2>&1; then
+      pkill -f "ssh -N -L ${local_port}:localhost:${remote_port}"
+      echo "  tunnel ${local_port}->${remote_port} closed"
+    else
+      echo "  tunnel ${local_port}->${remote_port} not running"
+    fi
+  done
+  exit 0
+fi
+
+echo "Bringing up tswork..."
+tswork up
+
+echo "Setting up SSH tunnels to ${HOST}..."
+
+for t in "${TUNNELS[@]}"; do
+  local_port="${t%%:*}"
+  remote_port="${t##*:}"
+
+  # Skip if a tunnel for this local port is already running
+  if pgrep -f "ssh -N -L ${local_port}:localhost:${remote_port}" >/dev/null 2>&1; then
+    echo "  tunnel ${local_port}->${remote_port} already up, skipping"
+    continue
+  fi
+
+  ssh -N -L "${local_port}:localhost:${remote_port}" "${HOST}" -f
+  echo "  tunnel ${local_port}->${remote_port} up"
+done
+
+echo "Connecting to ${HOST}..."
+exec ssh "${HOST}"
+
+

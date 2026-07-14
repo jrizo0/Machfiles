@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+#
+# ss2vps — sube el screenshot del clipboard (o el más reciente del Desktop)
+# a la VPS y pega la ruta remota en Alacritty automáticamente.
+#
+# Uso:
+#   ss2vps                  clipboard (o último screenshot) -> vps -> paste en Alacritty
+#   ss2vps --no-paste       igual, pero solo deja la ruta en el clipboard
+#   ss2vps --file <img>     sube un archivo específico
+#
+set -euo pipefail
+
+REMOTE_HOST="vpsjr"
+REMOTE_DIR="screenshots"          # relativo al $HOME remoto
+SCREENSHOT_DIR="$HOME/Desktop"    # donde macOS guarda capturas a archivo
+TERMINAL_APP="Alacritty"
+FALLBACK_MAX_AGE_MIN=10           # edad máxima del screenshot en Desktop (fallback)
+
+# ControlMaster propio del script: la primera subida abre la conexión y las
+# siguientes (por 10 min) son instantáneas. No toca ~/.ssh/config.
+SSH_OPTS=(
+  -o BatchMode=yes
+  -o ConnectTimeout=5
+  -o ControlMaster=auto
+  -o "ControlPath=$HOME/.ssh/ss2vps-%r@%h:%p"
+  -o ControlPersist=600
+)
+
+notify() { osascript -e "display notification \"$1\" with title \"ss2vps\"" >/dev/null 2>&1 || true; }
+die()    { notify "$1"; echo "ss2vps: $1" >&2; exit 1; }
+
+do_paste=1
+src_file=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --no-paste) do_paste=0; shift ;;
+    --file)     src_file="${2:?falta la ruta después de --file}"; shift 2 ;;
+    *) die "opción desconocida: $1" ;;
+  esac
+done
+
+tmpbase="$(mktemp -t ss2vps)"
+tmp="$tmpbase.png"
+trap 'rm -f "$tmpbase" "$tmp"' EXIT
+
+if [[ -n "$src_file" ]]; then
+  [[ -f "$src_file" ]] || die "no existe el archivo: $src_file"
+  cp "$src_file" "$tmp"
+elif osascript -e 'clipboard info' 2>/dev/null | grep -q 'PNGf'; then
+  # Imagen en el clipboard (Cmd+Ctrl+Shift+4)
+  osascript \
+    -e "set f to open for access POSIX file \"$tmp\" with write permission" \
+    -e 'write (the clipboard as «class PNGf») to f' \
+    -e 'close access f' \
+    || die "no pude extraer la imagen del clipboard"
+else
+  # Fallback: screenshot a archivo (Cmd+Shift+4) reciente en el Desktop
+  latest="$(find "$SCREENSHOT_DIR" -maxdepth 1 -name '*.png' -mmin "-$FALLBACK_MAX_AGE_MIN" -print0 2>/dev/null \
+            | xargs -0 ls -t 2>/dev/null | head -n1 || true)"
+  [[ -n "$latest" ]] || die "no hay imagen en el clipboard ni screenshot reciente en Desktop"
+  cp "$latest" "$tmp"
+fi
+
+name="ss-$(date +%Y%m%d-%H%M%S)-$RANDOM.png"
+
+# Una sola conexión SSH: crea el dir, escribe el archivo y devuelve la ruta absoluta
+remote_path="$(ssh "${SSH_OPTS[@]}" "$REMOTE_HOST" \
+  "mkdir -p ~/$REMOTE_DIR && cat > ~/$REMOTE_DIR/$name && echo \"\$HOME/$REMOTE_DIR/$name\"" \
+  < "$tmp")" || die "falló la subida a $REMOTE_HOST"
+
+printf '%s' "$remote_path" | pbcopy
+echo "$remote_path"
+
+if [[ $do_paste -eq 1 ]]; then
+  osascript \
+    -e "tell application \"$TERMINAL_APP\" to activate" \
+    -e 'delay 0.15' \
+    -e 'tell application "System Events" to keystroke "v" using command down' \
+    || notify "subido, pero no pude pegar (¿permiso de Accesibilidad?). Ruta en el clipboard."
+fi
