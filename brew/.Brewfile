@@ -1,139 +1,197 @@
-tap "azure/functions"
-tap "gromgit/fuse"
-tap "hashicorp/tap"
-tap "homebrew/cask-fonts"
-tap "homebrew/services"
-tap "koekeishiya/formulae"
-tap "libsql/sqld"
+# Brewfile — macOS
+# Regenerar referencia:  brew bundle dump --file=/tmp/Brewfile.dump --force
+# Instalar todo:         brew bundle --file=~/.Brewfile
+# Auditar sobrantes:     brew bundle cleanup --file=~/.Brewfile
+
+# ══════════════════════════════════════════════════════════
+# TAPS
+# ══════════════════════════════════════════════════════════
+tap "koekeishiya/formulae"                                               # skhd, yabai
+tap "anomalyco/tap", "https://github.com/anomalyco/homebrew-tap.git"     # mole
+tap "asmvik/formulae", "https://github.com/asmvik/homebrew-formulae.git" # sheets
 tap "ngrok/ngrok"
-tap "opencode-ai/tap"
-tap "pulumi/tap"
-tap "stripe/stripe-cli"
-tap "tursodatabase/tap"
-brew "libtiff"
-brew "jpeg-xl"
-brew "aom"
-brew "python@3.12"
-brew "azure-cli"
+
+# ══════════════════════════════════════════════════════════
+# CLI — core
+# ══════════════════════════════════════════════════════════
 brew "bat"
-brew "glib"
-brew "cocoapods"
-brew "diff-so-fancy"
-brew "wxwidgets"
-brew "erlang"
-brew "elixir"
+brew "btop"
 brew "fd"
-brew "gnutls"
-brew "harfbuzz"
-brew "leptonica"
-brew "libass"
-brew "libmicrohttpd"
-brew "librist"
-brew "pango"
-brew "tesseract"
-brew "ffmpeg"
-brew "flyctl"
-brew "fnm"
 brew "fzf"
-brew "gcc"
 brew "gh"
 brew "git"
 brew "glow"
 brew "gnu-sed"
 brew "htop"
 brew "jq"
-brew "luarocks"
-brew "mysql-client"
+brew "lazygit"
+brew "diff-so-fancy"
 brew "neovim"
-brew "nss"
-brew "openblas"
-brew "numpy"
 brew "onefetch"
-brew "pgbouncer"
-brew "pkgconf"
-brew "py3cairo", link: false
-brew "python@3.11"
 brew "ripgrep"
-brew "scipy"
 brew "stow"
-brew "telnet"
 brew "tldr"
 brew "tmux"
-brew "uv"
 brew "wget"
 brew "xclip"
 brew "zellij"
 brew "zoxide"
-brew "azure/functions/azure-functions-core-tools@4"
-brew "gromgit/fuse/sshfs-mac"
-brew "hashicorp/tap/terraform"
+brew "mas"        # Mac App Store CLI (requiere sesión iniciada en App Store)
+
+# ══════════════════════════════════════════════════════════
+# CLI — dev / runtimes
+# ══════════════════════════════════════════════════════════
+brew "fnm"        # node manager activo (zsh/exports.zsh)
+brew "nvm"        # lazy-load en .zshrc, solo compatibilidad
+brew "uv"
+brew "python@3.11"
+brew "python@3.14"
+brew "elixir"
+brew "luarocks"
+brew "cocoapods"
+brew "cloc"
+brew "mkcert"
+brew "socat"
+brew "telnet"
+brew "poppler"
+brew "ffmpeg"
+brew "scipy"
+brew "py3cairo", link: false
+
+# ══════════════════════════════════════════════════════════
+# CLI — infra / servicios
+# ══════════════════════════════════════════════════════════
+brew "azure-cli"
+brew "flyctl"
+brew "googleworkspace-cli"
+brew "mysql-client"
+brew "pgbouncer"
+brew "tailscale", link: false   # daemon CLI; la GUI va como cask abajo
+brew "mole"
+brew "sheets"
+brew "pkgconf"
+
+# ══════════════════════════════════════════════════════════
+# Window management (requieren permisos de Accesibilidad)
+# ══════════════════════════════════════════════════════════
 brew "koekeishiya/formulae/skhd"
 brew "koekeishiya/formulae/yabai"
-brew "pulumi/tap/pulumi"
-brew "stripe/stripe-cli/stripe"
-brew "tursodatabase/tap/turso"
-cask "alacritty"
-cask "alt-tab"
+
+# ══════════════════════════════════════════════════════════
+# CASKS — fuentes
+# ══════════════════════════════════════════════════════════
 cask "font-caskaydia-cove-nerd-font"
 cask "font-hack-nerd-font"
 cask "font-jetbrains-mono-nerd-font"
-cask "middleclick"
-cask "ngrok"
+
+# ══════════════════════════════════════════════════════════
+# CASKS — terminal y utilidades de sistema
+# ══════════════════════════════════════════════════════════
+cask "alacritty"
+cask "iterm2"
+cask "alt-tab"
 cask "raycast"
+cask "karabiner-elements"
+cask "middleclick"
 cask "unnaturalscrollwheels"
-vscode "ambar.bundle-size"
-vscode "amiralizadeh9480.laravel-extra-intellisense"
-vscode "astro-build.astro-vscode"
-vscode "austenc.tailwind-docs"
-vscode "bierner.color-info"
-vscode "biomejs.biome"
-vscode "bmewburn.vscode-intelephense-client"
-vscode "bocovo.dbml-erd-visualizer"
-vscode "bradlc.vscode-tailwindcss"
-vscode "dbaeumer.vscode-eslint"
-vscode "devsense.composer-php-vscode"
-vscode "devsense.phptools-vscode"
-vscode "devsense.profiler-php-vscode"
-vscode "djlynn03.insert-color"
-vscode "dsznajder.es7-react-js-snippets"
-vscode "esbenp.prettier-vscode"
-vscode "fernandotherojo.nandorojo-tamagui"
-vscode "github.codespaces"
-vscode "github.vscode-github-actions"
-vscode "jakebecker.elixir-ls"
-vscode "jdinhlife.gruvbox"
-vscode "jock.svg"
-vscode "kuscamara.electron"
-vscode "ms-azuretools.vscode-azurefunctions"
-vscode "ms-azuretools.vscode-azureresourcegroups"
-vscode "ms-azuretools.vscode-azurestaticwebapps"
-vscode "ms-azuretools.vscode-containers"
-vscode "ms-azuretools.vscode-docker"
-vscode "ms-vscode-remote.remote-containers"
-vscode "mvllow.rose-pine"
-vscode "naumovs.color-highlight"
-vscode "nrwl.angular-console"
-vscode "phoenixframework.phoenix"
-vscode "pkief.material-icon-theme"
-vscode "redhat.java"
-vscode "rvest.vs-code-prettier-eslint"
-vscode "sdras.night-owl"
-vscode "simonsiefke.svg-preview"
-vscode "statelyai.stately-vscode"
-vscode "supermaven.supermaven"
-vscode "tyriar.lorem-ipsum"
-vscode "unifiedjs.vscode-mdx"
-vscode "visualstudioexptteam.intellicode-api-usage-examples"
-vscode "visualstudioexptteam.vscodeintellicode"
-vscode "vscjava.vscode-gradle"
-vscode "vscjava.vscode-java-debug"
-vscode "vscjava.vscode-java-dependency"
-vscode "vscjava.vscode-java-pack"
-vscode "vscjava.vscode-java-test"
-vscode "vscjava.vscode-maven"
-vscode "vscodevim.vim"
-vscode "wesbos.theme-cobalt2"
-vscode "xyc.vscode-mdx-preview"
-vscode "yoavbls.pretty-ts-errors"
-vscode "yzhang.markdown-all-in-one"
-vscode "zarifprogrammer.tailwind-snippets"
+cask "keyboardcleantool"
+cask "blackhole-2ch"
+cask "tailscale-app"
+cask "teamviewer"
+
+# ══════════════════════════════════════════════════════════
+# CASKS — desarrollo
+# ══════════════════════════════════════════════════════════
+cask "cursor"
+cask "github"            # GitHub Desktop
+cask "t3-code"
+cask "postman"
+cask "tableplus"
+cask "postico"
+cask "postgres-unofficial"  # Postgres.app
+cask "figma"
+cask "ngrok"
+
+# ══════════════════════════════════════════════════════════
+# CASKS — navegadores
+# ══════════════════════════════════════════════════════════
+cask "google-chrome"
+cask "firefox"
+
+# ══════════════════════════════════════════════════════════
+# CASKS — productividad y comunicación
+# ══════════════════════════════════════════════════════════
+cask "notion-calendar"
+cask "obsidian"
+cask "slack"
+cask "telegram"
+cask "legcord"           # cliente Discord
+cask "zoom"
+cask "chatgpt"
+cask "spotify"
+
+# ══════════════════════════════════════════════════════════
+# CASKS — audio / video / dictado / archivos
+# ══════════════════════════════════════════════════════════
+cask "capcut"
+cask "wispr-flow"
+cask "pdfelement"
+cask "powerphotos"
+
+# ══════════════════════════════════════════════════════════
+# MAS — App Store (requiere iniciar sesión antes)
+# ══════════════════════════════════════════════════════════
+mas "Keynote", id: 409183694
+mas "Numbers", id: 409203825
+mas "Pages", id: 409201541
+mas "Xcode", id: 497799835
+mas "WhatsApp", id: 310633997
+mas "Harvest", id: 506189836
+mas "KeyBell", id: 1530838633
+mas "Microsoft Word", id: 462054704
+mas "Microsoft Excel", id: 462058435
+mas "Microsoft Outlook", id: 985367838
+mas "Windows App", id: 1295203466   # antes Microsoft Remote Desktop
+mas "UPDF", id: 1619925971
+mas "Developer", id: 640199958
+mas "HP Smart", id: 1474276998
+
+# ══════════════════════════════════════════════════════════
+# NPM globales (usa el node default de fnm)
+# ══════════════════════════════════════════════════════════
+npm "@fission-ai/openspec"
+npm "@openai/codex"
+npm "agent-browser"
+npm "corepack"
+npm "hrvst-cli"
+npm "mcp-chrome-bridge"
+npm "ralphy"
+npm "ralphy-cli"
+
+# ══════════════════════════════════════════════════════════
+# UV tools
+# ══════════════════════════════════════════════════════════
+uv "claude-monitor"
+uv "mcp-server-git"
+
+# ══════════════════════════════════════════════════════════
+# LEGACY / OPCIONAL — estaban en el Brewfile viejo pero ya no
+# están instalados en esta máquina. Descomentar si hacen falta.
+# ══════════════════════════════════════════════════════════
+# tap "azure/functions"
+# tap "hashicorp/tap"
+# tap "pulumi/tap"
+# tap "stripe/stripe-cli"
+# tap "tursodatabase/tap"
+# tap "gromgit/fuse"
+# brew "azure/functions/azure-functions-core-tools@4"
+# brew "hashicorp/tap/terraform"
+# brew "pulumi/tap/pulumi"
+# brew "stripe/stripe-cli/stripe"
+# brew "tursodatabase/tap/turso"
+# brew "gromgit/fuse/sshfs-mac"
+
+# NO automatizables (instalar manualmente):
+#   - DaVinci Resolve (blackmagicdesign.com — el cask fue retirado)
+#   - Microsoft Teams / Edge / Defender / Company Portal (gestionados por Intune)
+#   - Claude Code / OpenCode (instaladores curl — los cubre setup-mac.sh)

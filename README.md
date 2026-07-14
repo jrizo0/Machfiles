@@ -11,8 +11,10 @@ git clone https://github.com/jrizo0/Machfiles ~/.machfiles && cd ~/.machfiles &&
 # Linux Desktop (Ubuntu 22.04+)
 git clone https://github.com/jrizo0/Machfiles ~/.machfiles && cd ~/.machfiles && ./programs/setup.sh --desktop
 
-# macOS
-git clone https://github.com/jrizo0/Machfiles ~/.machfiles && cd ~/.machfiles && brew bundle --file=brew/.Brewfile && stow zsh tmux git gh lazygit scripts
+# macOS (Mac nuevo: inicia sesión en App Store primero, para las apps `mas`)
+git clone https://github.com/jrizo0/Machfiles ~/Machfiles && cd ~/Machfiles && ./programs/setup-mac.sh
+# Opciones: --skip-brew (sin paquetes), --skip-defaults (sin macOS defaults)
+# El Brewfile incluye: formulae, casks (GUI apps), mas (App Store), npm globales, uv tools y extensiones de VSCode
 ```
 
 ## What's Included
