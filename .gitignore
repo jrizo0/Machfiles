@@ -13,6 +13,7 @@ scripts/.local/bin/*
 
 getnf/
 lazygit/.config/lazygit
+**/karabiner/automatic_backups/
 **/node_modules/
 .DS_Store
 
