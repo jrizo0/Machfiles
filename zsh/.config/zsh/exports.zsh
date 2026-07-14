@@ -12,27 +12,25 @@ export PATH=$HOME/.cargo/bin:$PATH
 export PATH=$HOME/.local/share/go/bin:$PATH
 export GOPATH=$HOME/.local/share/go
 export PATH=$HOME/.fnm:$PATH
-export PATH="/home/jrizo/.local/share/fnm:$PATH"
+export PATH="$HOME/.local/share/fnm:$PATH"
+export PATH="$HOME/Library/Application Support/fnm:$PATH"
 export PATH="$HOME/.local/share/neovim/bin":$PATH
 # export XDG_CURRENT_DESKTOP="Wayland"
 #export PATH="$PATH:./node_modules/.bin"
-eval "$(fnm env)"
+command -v fnm &> /dev/null && eval "$(fnm env)"
 eval "$(zoxide init zsh)"
 # eval "`pip completion --zsh`"
 
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$("$HOME/.miniconda/bin/conda" 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "$HOME/.miniconda/etc/profile.d/conda.sh" ]; then
-        . "$HOME/.miniconda/etc/profile.d/conda.sh"
-    else
-        export PATH="$HOME/.miniconda/bin:$PATH"
-    fi
+# conda: lazy-load (el hook de conda arranca python y es lento;
+# solo se inicializa la primera vez que se usa el comando `conda`)
+if [ -x "$HOME/.miniconda/bin/conda" ]; then
+    conda() {
+        unfunction conda
+        eval "$("$HOME/.miniconda/bin/conda" 'shell.zsh' 'hook' 2> /dev/null)" \
+            || . "$HOME/.miniconda/etc/profile.d/conda.sh" 2> /dev/null \
+            || export PATH="$HOME/.miniconda/bin:$PATH"
+        conda "$@"
+    }
 fi
-unset __conda_setup
-# <<< conda initialize <<<
 

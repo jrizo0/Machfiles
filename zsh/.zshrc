@@ -67,16 +67,10 @@ function nvims() {
 
 # end vim switcher
 
-# fnm
-export PATH="/home/jrizo/.local/share/fnm:$PATH"
-eval "`fnm env`"
-
-# fnm
-export PATH="/Users/jrizo/Library/Application Support/fnm:$PATH"
-eval "`fnm env`"
+# fnm: ya se inicializa en exports.zsh (PATH + un solo `fnm env`)
 
 # pnpm
-export PNPM_HOME="/Users/jrizo/Library/pnpm"
+export PNPM_HOME="$HOME/Library/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;
@@ -85,7 +79,7 @@ alias pn="pnpm"
 # pnpm end
 
 # bun completions
-[ -s "/Users/jrizo/.bun/_bun" ] && source "/Users/jrizo/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
@@ -107,16 +101,19 @@ cc(){
 export PATH="$HOME/.local/bin:$PATH"
 
 
+# nvm: lazy-load (sourcearlo al inicio costaba ~4.8s; fnm es el manager activo).
+# Solo se carga la primera vez que se usa el comando `nvm`.
 export NVM_DIR="$HOME/.nvm"
-  [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
-  [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+nvm() {
+  unfunction nvm
+  [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+  nvm "$@"
+}
 
 
 # opencode
-export PATH=/home/jrizo/.opencode/bin:$PATH
-
-# opencode
-export PATH=/Users/jrizo/.opencode/bin:$PATH
+export PATH=$HOME/.opencode/bin:$PATH
 
 # === CONFIG ===
 REPO_PATH="/Users/jrizo/Work/pioneer"
